@@ -41,7 +41,7 @@ export default function Home() {
       {/* Full-width Header Banner */}
       <section id="home" className="w-full relative">
         {/* Background image from public/header.jpg */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 z-0">
           <Image
             src="/header.jpg"
             alt="Field with pheasant hunting scene"
@@ -49,9 +49,9 @@ export default function Home() {
             style={{ objectFit: 'cover', objectPosition: 'center' }}
             priority
           />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-black/30 z-10" />
         </div>
-        <div className="max-w-7xl mx-auto px-4 py-24 sm:py-32 text-center">
+        <div className="max-w-7xl mx-auto px-4 py-24 sm:py-32 text-center relative z-20">
           <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome to Cromwell Fish & Game Club</h2>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-white/90 mb-6">
             Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.
