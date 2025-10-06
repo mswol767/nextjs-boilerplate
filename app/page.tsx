@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
       {/* Navigation */}
-      <header className={`bg-green-800 w-full text-white transition-all duration-500 overflow-hidden ${activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20'}`}>
+  <header className={`bg-green-800 w-full text-white transition-all duration-500 overflow-hidden ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
           <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
           {/* Mobile menu button */}
