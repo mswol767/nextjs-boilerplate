@@ -122,9 +122,9 @@ export default function Home() {
         <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
           <ul className="list-disc list-inside space-y-2 text-center sm:text-left">
-            <li>October 12: Fall Hunting Seminar</li>
-            <li>October 19: Youth Fishing Day</li>
-            <li>November 5: Annual Membership Meeting</li>
+            <li>October 2: October Meeting @ 6:30PM </li>
+            <li>October 2: Annual Member Meeting @ 7:00PM</li>
+            <li>November 6: November Meeting @ 6:30PM</li>
           </ul>
         </section>
       )}
