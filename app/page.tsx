@@ -38,18 +38,31 @@ export default function Home() {
         )}
       </header>
 
-      {/* Hero Section */}
-      <section id="home" className="flex flex-col items-center justify-center text-center px-4 py-16 sm:py-24 sm:px-8">
-        <h2 className="text-3xl sm:text-5xl font-bold mb-4">Welcome to Cromwell Fish & Game Club</h2>
-        <p className="text-lg sm:text-xl max-w-2xl mb-6">
-          Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.
-        </p>
-        <a
-          href="#membership"
-          className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
-        >
-          Become a Member
-        </a>
+      {/* Full-width Header Banner */}
+      <section id="home" className="w-full relative">
+        {/* Background image from public/header.jpg */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/header.jpg"
+            alt="Field with pheasant hunting scene"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            priority
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 py-24 sm:py-32 text-center">
+          <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome to Cromwell Fish & Game Club</h2>
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-white/90 mb-6">
+            Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.
+          </p>
+          <a
+            href="#membership"
+            className="inline-block bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+          >
+            Become a Member
+          </a>
+        </div>
       </section>
 
       {/* Events Section */}
