@@ -49,7 +49,7 @@ export default function Home() {
       const obs = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) setActiveSection(id);
+            if (entry.isIntersecting && !manualNavRef.current) setActiveSection(id);
           });
         },
         { root: null, rootMargin: "-20% 0px -60% 0px", threshold: 0 }
