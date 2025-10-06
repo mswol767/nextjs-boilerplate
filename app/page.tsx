@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("home");
+  const manualNavRef = useRef(false);
 
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
     e.preventDefault();
-    // set active immediately so conditional rendering can show the section
-    setActiveSection(id);
-    setMenuOpen(false);
+  // set active immediately so conditional rendering can show the section
+  setActiveSection(id);
+  setMenuOpen(false);
+  // mark manual nav so the observer doesn't override our choice while scrolling
+  manualNavRef.current = true;
     // update hash without jumping instantly
     history.replaceState(null, "", `#${id}`);
 
@@ -28,6 +31,10 @@ export default function Home() {
           const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
           window.scrollTo({ top, behavior: 'smooth' });
         }
+        // allow the observer to resume after the scroll finishes
+        setTimeout(() => {
+          manualNavRef.current = false;
+        }, 600);
       }, 50);
     });
   }
