@@ -11,7 +11,12 @@ export default function Home() {
     e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      // compute offset for header height so section isn't hidden under sticky header
+      const header = document.querySelector('header');
+      const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
+      const extraOffset = 12; // small breathing room
+      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
+      window.scrollTo({ top, behavior: 'smooth' });
       setActiveSection(id);
     }
     setMenuOpen(false);
