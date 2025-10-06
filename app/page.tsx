@@ -1,62 +1,99 @@
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <div className="font-sans min-h-screen bg-green-50 text-gray-900">
-      {/* Header */}
-      <header className="bg-green-800 w-full py-6">
-        <h1 className="text-center text-4xl font-bold text-white">
-          Cromwell Fish & Game Club
-        </h1>
+    <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
+      {/* Navigation */}
+      <header className="bg-green-800 w-full text-white">
+        <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
+          <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
+          {/* Mobile menu button */}
+          <button
+            className="sm:hidden text-white"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+          {/* Desktop Menu */}
+          <nav className="hidden sm:flex gap-6 text-lg font-medium">
+            <a href="#home" className="hover:underline">Home</a>
+            <a href="#events" className="hover:underline">Events</a>
+            <a href="#membership" className="hover:underline">Membership</a>
+            <a href="#contact" className="hover:underline">Contact</a>
+          </nav>
+        </div>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
+            <a href="#home" className="hover:underline" onClick={() => setMenuOpen(false)}>Home</a>
+            <a href="#events" className="hover:underline" onClick={() => setMenuOpen(false)}>Events</a>
+            <a href="#membership" className="hover:underline" onClick={() => setMenuOpen(false)}>Membership</a>
+            <a href="#contact" className="hover:underline" onClick={() => setMenuOpen(false)}>Contact</a>
+          </nav>
+        )}
       </header>
 
-      {/* Main content */}
-      <main className="p-8 sm:p-20 flex flex-col gap-16 items-center">
-        {/* Club intro */}
-        <section className="max-w-3xl text-center">
-          <p className="text-lg">
-            Welcome to the Cromwell Fish & Game Club! Join us for outdoor activities, hunting, fishing, and community events in a safe and friendly environment.
-          </p>
-        </section>
+      {/* Hero Section */}
+      <section id="home" className="flex flex-col items-center justify-center text-center px-4 py-16 sm:py-24 sm:px-8">
+        <h2 className="text-3xl sm:text-5xl font-bold mb-4">Welcome to Cromwell Fish & Game Club</h2>
+        <p className="text-lg sm:text-xl max-w-2xl mb-6">
+          Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.
+        </p>
+        <a
+          href="#membership"
+          className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+        >
+          Become a Member
+        </a>
+      </section>
 
-        {/* Events */}
-        <section className="max-w-3xl w-full">
-          <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
-          <ul className="list-disc list-inside space-y-2">
-            <li>October 12: Fall Hunting Seminar</li>
-            <li>October 19: Youth Fishing Day</li>
-            <li>November 5: Annual Membership Meeting</li>
-          </ul>
-        </section>
+      {/* Events Section */}
+      <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
+        <ul className="list-disc list-inside space-y-2 text-center sm:text-left">
+          <li>October 12: Fall Hunting Seminar</li>
+          <li>October 19: Youth Fishing Day</li>
+          <li>November 5: Annual Membership Meeting</li>
+        </ul>
+      </section>
 
-        {/* Membership info */}
-        <section className="max-w-3xl w-full">
-          <h2 className="text-2xl font-semibold mb-4">Become a Member</h2>
-          <p className="mb-4">
-            Membership includes access to our club facilities, participation in events, and the chance to join a community of outdoor enthusiasts.
-          </p>
-          <a
-            href="#"
-            className="inline-block bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
-          >
-            Join Now
-          </a>
-        </section>
+      {/* Membership Section */}
+      <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8 text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Become a Member</h2>
+        <p className="mb-6 max-w-2xl mx-auto">
+          Membership gives you access to our club facilities, events, and the chance to join a community of outdoor enthusiasts.
+        </p>
+        <a
+          href="#contact"
+          className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+        >
+          Join Now
+        </a>
+      </section>
 
-        {/* Optional club image */}
-        <section>
-          <Image
-            src="/clubhouse.jpg" // replace with your own image
-            alt="Cromwell Fish & Game Club"
-            width={600}
-            height={400}
-            className="rounded shadow-lg"
-          />
-        </section>
-      </main>
+      {/* Contact Section */}
+      <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
+        <p className="mb-4">Email: info@cromwellfgc.org</p>
+        <p>Phone: (860) 555-1234</p>
+      </section>
+
+      {/* Optional Club Image */}
+      <section className="py-12 px-4 sm:px-8 flex justify-center">
+        <Image
+          src="/clubhouse.jpg" // replace with your own image
+          alt="Cromwell Fish & Game Club"
+          width={600}
+          height={400}
+          className="rounded shadow-lg"
+        />
+      </section>
 
       {/* Footer */}
-      <footer className="bg-green-800 w-full py-6 text-center text-white">
+      <footer className="bg-green-800 text-white py-6 text-center">
         &copy; {new Date().getFullYear()} Cromwell Fish & Game Club. All rights reserved.
       </footer>
     </div>
