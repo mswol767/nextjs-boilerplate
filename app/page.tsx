@@ -1,9 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("home");
+
+  // Smoothly scroll to section and mark active; close mobile menu when used
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveSection(id);
+    }
+    setMenuOpen(false);
+    // update hash without jumping instantly
+    history.replaceState(null, "", `#${id}`);
+  }
+
+  // Optional: update activeSection on scroll using IntersectionObserver
+  useEffect(() => {
+    const ids = ["home", "events", "membership", "contact"];
+    const observers: IntersectionObserver[] = [];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) setActiveSection(id);
+          });
+        },
+        { root: null, rootMargin: "-20% 0px -60% 0px", threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
 
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
@@ -20,19 +55,19 @@ export default function Home() {
           </button>
           {/* Desktop Menu */}
           <nav className="hidden sm:flex gap-6 text-lg font-medium">
-            <a href="#home" className="hover:underline">Home</a>
-            <a href="#events" className="hover:underline">Events</a>
-            <a href="#membership" className="hover:underline">Membership</a>
-            <a href="#contact" className="hover:underline">Contact</a>
+            <a href="#home" onClick={(e) => handleNavClick(e, "home")} className={`hover:underline ${activeSection === "home" ? "underline decoration-2" : ""}`}>Home</a>
+            <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}>Events</a>
+            <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}>Membership</a>
+            <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>Contact</a>
           </nav>
         </div>
         {/* Mobile Menu */}
         {menuOpen && (
           <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
-            <a href="#home" className="hover:underline" onClick={() => setMenuOpen(false)}>Home</a>
-            <a href="#events" className="hover:underline" onClick={() => setMenuOpen(false)}>Events</a>
-            <a href="#membership" className="hover:underline" onClick={() => setMenuOpen(false)}>Membership</a>
-            <a href="#contact" className="hover:underline" onClick={() => setMenuOpen(false)}>Contact</a>
+            <a href="#home" className={`hover:underline ${activeSection === "home" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "home")}>Home</a>
+            <a href="#events" className={`hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}>Events</a>
+            <a href="#membership" className={`hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}>Membership</a>
+            <a href="#contact" className={`hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>Contact</a>
           </nav>
         )}
       </header>
