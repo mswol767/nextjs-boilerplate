@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 export default function Home() {
@@ -39,18 +38,13 @@ export default function Home() {
       </header>
 
       {/* Full-width Header Banner */}
-      <section id="home" className="w-full relative">
-        {/* Background image from public/header.jpg */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/header.jpg"
-            alt="Field with pheasant hunting scene"
-            fill
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
-            priority
-          />
-          <div className="absolute inset-0 bg-black/30 z-10" />
-        </div>
+      <section
+        id="home"
+        className="w-full relative bg-cover bg-center"
+        style={{ backgroundImage: "url('/header.jpg')" }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/30 z-10" />
         <div className="max-w-7xl mx-auto px-4 py-24 sm:py-32 text-center relative z-20">
           <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4">Welcome to Cromwell Fish & Game Club</h2>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-white/90 mb-6">
