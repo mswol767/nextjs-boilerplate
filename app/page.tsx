@@ -140,6 +140,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* About Us Section */}
+      {(activeSection === "home" || activeSection === "about") && (
+        <section id="about" className="max-w-6xl mx-auto px-4 sm:px-8 py-12">
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4">About Us</h2>
+              <p className="mb-4 text-gray-700">
+                Cromwell Fish & Game Club is a community-run organization dedicated to promoting responsible outdoor recreation,
+                conservation, and education. Our members enjoy regular meetings, youth events, and habitat stewardship projects.
+              </p>
+              <p className="text-gray-700">
+                We welcome hunters, anglers, and anyone interested in learning outdoor skills or supporting local conservation efforts.
+              </p>
+            </div>
+            <div className="rounded overflow-hidden shadow">
+              <img src="/file.svg" alt="Club activities" className="w-full h-56 object-cover" />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Conditionally rendered content sections */}
       {(activeSection === "home" || activeSection === "events") && (
         <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
