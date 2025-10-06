@@ -212,13 +212,13 @@ export default function Home() {
               }
 
               return events.map((ev) => (
-                <article key={ev.id} className="bg-white rounded shadow p-4">
-                  <h3 className="text-lg font-semibold">{ev.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{formatLocal(ev.start)} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
-                  <p className="text-sm mb-3">{ev.description}</p>
+                <article key={ev.id} className="bg-white rounded shadow p-4 border-l-4 border-green-800">
+                  <h3 className="text-lg font-semibold text-green-900">{ev.title}</h3>
+                  <p className="text-sm text-green-700 mb-2">{formatLocal(ev.start)} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
+                  <p className="text-sm mb-3 text-gray-700">{ev.description}</p>
                   <div className="flex gap-3">
-                    <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-500">Add to Google Calendar</a>
-                    <button onClick={() => downloadICS(ev)} className="inline-block bg-gray-800 text-white px-3 py-2 rounded hover:bg-gray-700">Download .ics</button>
+                    <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-800 text-white px-3 py-2 rounded hover:bg-green-700">Add to Google Calendar</a>
+                    <button onClick={() => downloadICS(ev)} className="inline-block bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500">Download .ics</button>
                   </div>
                 </article>
               ));
