@@ -83,16 +83,6 @@ export default function Home() {
         <p>Phone: (860) 555-1234</p>
       </section>
 
-      {/* Optional Club Image */}
-      <section className="py-12 px-4 sm:px-8 flex justify-center">
-        <Image
-          src="/clubhouse.jpg" // replace with your own image
-          alt="Cromwell Fish & Game Club"
-          width={600}
-          height={400}
-          className="rounded shadow-lg"
-        />
-      </section>
 
       {/* Footer */}
       <footer className="bg-green-800 text-white py-6 text-center">
