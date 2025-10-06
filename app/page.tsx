@@ -79,7 +79,7 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
         <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
-        <p className="mb-4">Email: info@cromwellfgc.org</p>
+        <p className="mb-4">Email: cromwellfgc@gmail.com</p>
         <p>Phone: (860) 555-1234</p>
       </section>
 
