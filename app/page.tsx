@@ -7,6 +7,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("home");
   const manualNavRef = useRef(false);
   const [eventsData, setEventsData] = useState<any[] | null>(null);
+  const [showPast, setShowPast] = useState(false);
 
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
@@ -144,6 +145,10 @@ export default function Home() {
         <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
           {/* Event cards */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-700">Showing {events.length} event{events.length !== 1 ? 's' : ''}</p>
+            <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">{showPast ? 'Hide past events' : 'Show past events'}</button>
+          </div>
           <div className="grid gap-6 sm:grid-cols-2">
             {(() => {
               const defaultYear = new Date().getFullYear();
@@ -153,6 +158,10 @@ export default function Home() {
                 { id: 'nov-meeting', title: 'November Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 10, 6, 18, 30), durationMinutes: 60 },
               ];
               const events = eventsData && eventsData.length ? eventsData : defaults;
+              const now = new Date();
+              const upcoming = events.filter((e: any) => new Date(e.start) >= now);
+              const past = events.filter((e: any) => new Date(e.start) < now);
+              const shown = showPast ? [...upcoming, ...past] : upcoming;
 
               function pad(n: number) { return n.toString().padStart(2, '0'); }
 
@@ -216,7 +225,7 @@ export default function Home() {
                 setTimeout(() => URL.revokeObjectURL(url), 5000);
               }
 
-              return events.map((ev) => (
+              return shown.map((ev) => (
                 <article key={ev.id} className="bg-white rounded shadow p-4 border-l-4 border-green-800">
                   <h3 className="text-lg font-semibold text-green-900">{ev.title}</h3>
                   <p className="text-sm text-green-700 mb-2">{formatLocal(ev.start)} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
