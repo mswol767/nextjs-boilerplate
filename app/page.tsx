@@ -9,19 +9,27 @@ export default function Home() {
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
     e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
-      // compute offset for header height so section isn't hidden under sticky header
-      const header = document.querySelector('header');
-      const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
-      const extraOffset = 12; // small breathing room
-      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
-      window.scrollTo({ top, behavior: 'smooth' });
-      setActiveSection(id);
-    }
+    // set active immediately so conditional rendering can show the section
+    setActiveSection(id);
     setMenuOpen(false);
     // update hash without jumping instantly
     history.replaceState(null, "", `#${id}`);
+
+    // wait a tick for DOM updates (in case the target was conditionally rendered), then scroll
+    requestAnimationFrame(() => {
+      // small delay to ensure layout settled
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          // compute offset for header height so section isn't hidden under sticky header
+          const header = document.querySelector('header');
+          const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
+          const extraOffset = 12; // small breathing room
+          const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }, 50);
+    });
   }
 
   // Optional: update activeSection on scroll using IntersectionObserver
