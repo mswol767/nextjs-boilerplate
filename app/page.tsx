@@ -121,11 +121,109 @@ export default function Home() {
       {(activeSection === "home" || activeSection === "events") && (
         <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
-          <ul className="list-disc list-inside space-y-2 text-center sm:text-left">
-            <li>October 2: October Meeting @ 6:30PM </li>
-            <li>October 2: Annual Member Meeting @ 7:00PM</li>
-            <li>November 6: November Meeting @ 6:30PM</li>
-          </ul>
+          {/* Event cards */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            {(() => {
+              const year = new Date().getFullYear();
+              const events = [
+                {
+                  id: 'oct-meeting',
+                  title: 'October Meeting',
+                  description: 'Monthly club meeting',
+                  start: new Date(year, 9, 2, 18, 30), // Oct is month 9
+                  durationMinutes: 60,
+                },
+                {
+                  id: 'annual',
+                  title: 'Annual Member Meeting',
+                  description: 'Annual meeting for members',
+                  start: new Date(year, 9, 2, 19, 0),
+                  durationMinutes: 90,
+                },
+                {
+                  id: 'nov-meeting',
+                  title: 'November Meeting',
+                  description: 'Monthly club meeting',
+                  start: new Date(year, 10, 6, 18, 30), // Nov is month 10
+                  durationMinutes: 60,
+                },
+              ];
+
+              function pad(n: number) { return n.toString().padStart(2, '0'); }
+
+              function toGoogleDate(d: Date) {
+                // YYYYMMDDTHHMMSSZ in UTC
+                const y = d.getUTCFullYear();
+                const m = pad(d.getUTCMonth() + 1);
+                const day = pad(d.getUTCDate());
+                const hh = pad(d.getUTCHours());
+                const mm = pad(d.getUTCMinutes());
+                const ss = pad(d.getUTCSeconds());
+                return `${y}${m}${day}T${hh}${mm}${ss}Z`;
+              }
+
+              function formatLocal(d: Date) {
+                return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+              }
+
+              function getGoogleUrl(ev: any) {
+                const start = toGoogleDate(ev.start);
+                const end = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
+                const text = encodeURIComponent(ev.title);
+                const details = encodeURIComponent(ev.description || '');
+                const location = encodeURIComponent('Cromwell Fish & Game Club');
+                return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=true&output=xml`;
+              }
+
+              function buildICS(ev: any) {
+                const dtstamp = toGoogleDate(new Date());
+                const dtstart = toGoogleDate(ev.start);
+                const dtend = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
+                const uid = `${ev.id}@cromwellfgc.local`;
+                return [
+                  'BEGIN:VCALENDAR',
+                  'VERSION:2.0',
+                  'PRODID:-//Cromwell FGC//EN',
+                  'CALSCALE:GREGORIAN',
+                  'BEGIN:VEVENT',
+                  `UID:${uid}`,
+                  `DTSTAMP:${dtstamp}`,
+                  `DTSTART:${dtstart}`,
+                  `DTEND:${dtend}`,
+                  `SUMMARY:${ev.title}`,
+                  `DESCRIPTION:${ev.description || ''}`,
+                  `LOCATION:Cromwell Fish & Game Club`,
+                  'END:VEVENT',
+                  'END:VCALENDAR',
+                ].join('\r\n');
+              }
+
+              function downloadICS(ev: any) {
+                const ics = buildICS(ev);
+                const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${ev.id}.ics`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+              }
+
+              return events.map((ev) => (
+                <article key={ev.id} className="bg-white rounded shadow p-4">
+                  <h3 className="text-lg font-semibold">{ev.title}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{formatLocal(ev.start)} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
+                  <p className="text-sm mb-3">{ev.description}</p>
+                  <div className="flex gap-3">
+                    <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-500">Add to Google Calendar</a>
+                    <button onClick={() => downloadICS(ev)} className="inline-block bg-gray-800 text-white px-3 py-2 rounded hover:bg-gray-700">Download .ics</button>
+                  </div>
+                </article>
+              ));
+            })()}
+          </div>
         </section>
       )}
 
