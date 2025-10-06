@@ -147,7 +147,7 @@ export default function Home() {
       {(activeSection === "home" || activeSection === "contact") && (
         <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
-          <p className="mb-4">Email: cromwellfgc@gmail.com</p>
+          <p className="mb-4">Email: <a href="mailto:cromwellfgc@gmail.com" aria-label="Email Cromwell Fish and Game Club" className="text-green-900 underline hover:text-green-700">cromwellfgc@gmail.com</a></p>
         </section>
       )}
 
