@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
       {/* Navigation */}
-      <header className="bg-green-800 w-full text-white">
+      <header className={`bg-green-800 w-full text-white transition-all duration-500 overflow-hidden ${activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
           <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
           {/* Mobile menu button */}
@@ -66,6 +66,14 @@ export default function Home() {
             <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>Contact</a>
           </nav>
         </div>
+        {/* Show all button when in single-section view */}
+        {activeSection !== 'home' && (
+          <div className="max-w-7xl mx-auto px-4 pb-2">
+            <button onClick={() => setActiveSection('home')} className="text-sm text-white/90 hover:text-white underline">
+              Show all
+            </button>
+          </div>
+        )}
         {/* Mobile Menu */}
         {menuOpen && (
           <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
