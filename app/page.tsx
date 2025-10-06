@@ -6,6 +6,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("home");
   const manualNavRef = useRef(false);
+  const [eventsData, setEventsData] = useState<any[] | null>(null);
 
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
@@ -58,6 +59,27 @@ export default function Home() {
       observers.push(obs);
     });
     return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
+  // Load events.json from public/ if available
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch('/events.json');
+        if (!res.ok) throw new Error('no events.json');
+        const data = await res.json();
+        if (cancelled) return;
+        // convert start to Date
+        const parsed = data.map((e: any) => ({ ...e, start: new Date(e.start) }));
+        setEventsData(parsed);
+      } catch (err) {
+        // ignore, we'll use defaults
+        setEventsData(null);
+      }
+    }
+    load();
+    return () => { cancelled = true };
   }, []);
 
   return (
@@ -124,30 +146,13 @@ export default function Home() {
           {/* Event cards */}
           <div className="grid gap-6 sm:grid-cols-2">
             {(() => {
-              const year = new Date().getFullYear();
-              const events = [
-                {
-                  id: 'oct-meeting',
-                  title: 'October Meeting',
-                  description: 'Monthly club meeting',
-                  start: new Date(year, 9, 2, 18, 30), // Oct is month 9
-                  durationMinutes: 60,
-                },
-                {
-                  id: 'annual',
-                  title: 'Annual Member Meeting',
-                  description: 'Annual meeting for members',
-                  start: new Date(year, 9, 2, 19, 0),
-                  durationMinutes: 90,
-                },
-                {
-                  id: 'nov-meeting',
-                  title: 'November Meeting',
-                  description: 'Monthly club meeting',
-                  start: new Date(year, 10, 6, 18, 30), // Nov is month 10
-                  durationMinutes: 60,
-                },
+              const defaultYear = new Date().getFullYear();
+              const defaults = [
+                { id: 'oct-meeting', title: 'October Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 9, 2, 18, 30), durationMinutes: 60 },
+                { id: 'annual', title: 'Annual Member Meeting', description: 'Annual meeting for members', start: new Date(defaultYear, 9, 2, 19, 0), durationMinutes: 90 },
+                { id: 'nov-meeting', title: 'November Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 10, 6, 18, 30), durationMinutes: 60 },
               ];
+              const events = eventsData && eventsData.length ? eventsData : defaults;
 
               function pad(n: number) { return n.toString().padStart(2, '0'); }
 
