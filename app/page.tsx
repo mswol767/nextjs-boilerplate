@@ -94,36 +94,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Events Section */}
-      <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
-        <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
-        <ul className="list-disc list-inside space-y-2 text-center sm:text-left">
-          <li>October 12: Fall Hunting Seminar</li>
-          <li>October 19: Youth Fishing Day</li>
-          <li>November 5: Annual Membership Meeting</li>
-        </ul>
-      </section>
+      {/* Conditionally rendered content sections */}
+      {(activeSection === "home" || activeSection === "events") && (
+        <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
+          <ul className="list-disc list-inside space-y-2 text-center sm:text-left">
+            <li>October 12: Fall Hunting Seminar</li>
+            <li>October 19: Youth Fishing Day</li>
+            <li>November 5: Annual Membership Meeting</li>
+          </ul>
+        </section>
+      )}
 
-      {/* Membership Section */}
-      <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8 text-center">
-        <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Become a Member</h2>
-        <p className="mb-6 max-w-2xl mx-auto">
-          Membership gives you access to our club facilities, events, and the chance to join a community of outdoor enthusiasts.
-        </p>
-        <a
-          href="#contact"
-          className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
-        >
-          Join Now
-        </a>
-      </section>
+      {(activeSection === "home" || activeSection === "membership") && (
+        <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Become a Member</h2>
+          <p className="mb-6 max-w-2xl mx-auto">
+            Membership gives you access to our club facilities, events, and the chance to join a community of outdoor enthusiasts.
+          </p>
+          <a
+            href="#contact"
+            className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+          >
+            Join Now
+          </a>
+        </section>
+      )}
 
-      {/* Contact Section */}
-      <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
-        <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
-        <p className="mb-4">Email: cromwellfgc@gmail.com</p>
-        <p>Phone: (860) 555-1234</p>
-      </section>
+      {(activeSection === "home" || activeSection === "contact") && (
+        <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
+          <p className="mb-4">Email: cromwellfgc@gmail.com</p>
+          <p>Phone: (860) 555-1234</p>
+        </section>
+      )}
 
 
       {/* Footer */}
