@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { useState } from "react";
 
@@ -12,7 +14,7 @@ export default function Home() {
           <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
           {/* Mobile menu button */}
           <button
-            className="sm:hidden text-white"
+            className="sm:hidden text-white text-2xl"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? "✕" : "☰"}
@@ -99,3 +101,4 @@ export default function Home() {
     </div>
   );
 }
+
