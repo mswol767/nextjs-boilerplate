@@ -15,6 +15,8 @@ export default function Home() {
   const [waitAddress, setWaitAddress] = useState('');
   const [waitMessage, setWaitMessage] = useState('');
   const [waitSuccess, setWaitSuccess] = useState('');
+  const [waitTown, setWaitTown] = useState('');
+  const [waitState, setWaitState] = useState('');
 
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
@@ -293,11 +295,17 @@ export default function Home() {
                 }
               }
 
+              // require town and state
+              if (!waitTown.trim() || !waitState.trim()) {
+                setWaitSuccess('Please provide your town and state.');
+                return;
+              }
+
               try {
                 const res = await fetch('/api/waitlist', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ name: waitName, email: waitEmail, phone: waitPhone, address: waitAddress, message: waitMessage }),
+                  body: JSON.stringify({ name: waitName, email: waitEmail, phone: waitPhone, address: waitAddress, town: waitTown, state: waitState, message: waitMessage }),
                 });
                 const json = await res.json();
                 if (!res.ok) throw new Error(json?.error || 'Submission failed');
@@ -309,7 +317,7 @@ export default function Home() {
                   setWaitSuccess('Thanks — you have been added to the wait list.');
                 }
                 // clear the form
-                setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitMessage('');
+                setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitTown(''); setWaitState(''); setWaitMessage('');
               } catch (err: any) {
                 setWaitSuccess(`Error: ${err?.message || 'Could not submit'}`);
               }
@@ -318,10 +326,14 @@ export default function Home() {
               <input className="w-full px-3 py-2 rounded border" placeholder="Email address" type="email" value={waitEmail} onChange={(e) => setWaitEmail(e.target.value)} required />
               <input className="w-full px-3 py-2 rounded border" placeholder="Phone number" type="tel" value={waitPhone} onChange={(e) => setWaitPhone(e.target.value)} />
               <input className="w-full px-3 py-2 rounded border" placeholder="Address (optional, include street number)" value={waitAddress} onChange={(e) => setWaitAddress(e.target.value)} />
+              <div className="grid sm:grid-cols-2 gap-3">
+                <input className="w-full px-3 py-2 rounded border" placeholder="Town" value={waitTown} onChange={(e) => setWaitTown(e.target.value)} required />
+                <input className="w-full px-3 py-2 rounded border" placeholder="State" value={waitState} onChange={(e) => setWaitState(e.target.value)} required />
+              </div>
               <textarea className="w-full px-3 py-2 rounded border" placeholder="Optional message (interests/notes)" value={waitMessage} onChange={(e) => setWaitMessage(e.target.value)} rows={3} />
               <div className="flex items-center justify-center gap-3">
                 <button type="submit" className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition">Join the Wait List</button>
-                <button type="button" onClick={() => { setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitMessage(''); setWaitSuccess(''); }} className="text-sm text-gray-700 underline">Clear</button>
+                <button type="button" onClick={() => { setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitTown(''); setWaitState(''); setWaitMessage(''); setWaitSuccess(''); }} className="text-sm text-gray-700 underline">Clear</button>
               </div>
             </form>
 
