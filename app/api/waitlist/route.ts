@@ -27,6 +27,39 @@ async function writeStore(filePath: string, data: WaitEntry[]) {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const download = url.searchParams.get('download');
+    const storePath = path.join(process.cwd(), 'data', 'waitlist.json');
+    const store = await readStore(storePath);
+
+    if (download === 'csv') {
+      // build CSV
+      const header = ['id', 'name', 'email', 'phone', 'address', 'message', 'createdAt'];
+      const rows = store.map((r) => header.map((h) => {
+        const v = (r as any)[h];
+        if (v === undefined || v === null) return '';
+        // escape double quotes
+        return `"${String(v).replace(/"/g, '""')}"`;
+      }).join(','));
+      const csv = [header.join(','), ...rows].join('\r\n');
+      return new Response(csv, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="waitlist.csv"',
+        },
+      });
+    }
+
+    return NextResponse.json({ ok: true, entries: store });
+  } catch (err: any) {
+    console.error('waitlist GET error', err);
+    return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
