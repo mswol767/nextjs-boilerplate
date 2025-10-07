@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
+import nodemailer from 'nodemailer';
 // Dynamically import google APIs when needed
 let googleSheets: any = null;
 async function getGoogleSheets() {
@@ -189,8 +190,39 @@ export async function POST(req: Request) {
 
     const writeResult = await writeStore(storePath, store);
 
+    // If SMTP configured, try to send an email notification about the new entry
+    let mailed = false;
+    try {
+      const smtpHost = process.env.SMTP_HOST;
+      const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : undefined;
+      const smtpUser = process.env.SMTP_USER;
+      const smtpPass = process.env.SMTP_PASS;
+      const emailTo = process.env.EMAIL_TO; // recipient
+
+      if (smtpHost && smtpPort && smtpUser && smtpPass && emailTo) {
+        const transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465, // true for 465, false for other ports
+          auth: { user: smtpUser, pass: smtpPass },
+        });
+
+        const text = `New waitlist entry:\n\nName: ${entry.name}\nEmail: ${entry.email}\nPhone: ${entry.phone || ''}\nAddress: ${entry.address || ''}\nMessage: ${entry.message || ''}\nCreatedAt: ${entry.createdAt}`;
+
+        await transporter.sendMail({
+          from: smtpUser,
+          to: emailTo,
+          subject: `New waitlist entry: ${entry.name}`,
+          text,
+        });
+        mailed = true;
+      }
+    } catch (err: any) {
+      console.error('Failed to send waitlist email', err?.message || err);
+    }
+
     // Inform caller where we persisted (or if it fell back to tmp) and sheet status
-    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback, sheetAppended });
+    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback, sheetAppended, mailed });
   } catch (err: any) {
     console.error('waitlist POST error', err);
     return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
