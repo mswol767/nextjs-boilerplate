@@ -1,0 +1,59 @@
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+type WaitEntry = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  message?: string;
+  createdAt: string;
+};
+
+async function readStore(filePath: string) {
+  try {
+    const raw = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(raw) as WaitEntry[];
+  } catch (err) {
+    return [];
+  }
+}
+
+async function writeStore(filePath: string, data: WaitEntry[]) {
+  const dir = path.dirname(filePath);
+  await fs.mkdir(dir, { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { name, email, phone, address, message } = body;
+
+    if (!name || !email) {
+      return NextResponse.json({ ok: false, error: 'Name and email are required' }, { status: 400 });
+    }
+
+    const entry: WaitEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: String(name),
+      email: String(email),
+      phone: phone ? String(phone) : undefined,
+      address: address ? String(address) : undefined,
+      message: message ? String(message) : undefined,
+      createdAt: new Date().toISOString(),
+    };
+
+    const storePath = path.join(process.cwd(), 'data', 'waitlist.json');
+    const store = await readStore(storePath);
+    store.push(entry);
+    await writeStore(storePath, store);
+
+    return NextResponse.json({ ok: true, entry });
+  } catch (err: any) {
+    console.error('waitlist POST error', err);
+    return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
+  }
+}

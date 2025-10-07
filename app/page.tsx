@@ -1,23 +1,33 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("home");
+  const [activeSection, setActiveSection] = useState<string>("about");
   const manualNavRef = useRef(false);
   const [eventsData, setEventsData] = useState<any[] | null>(null);
   const [showPast, setShowPast] = useState(false);
+  // Waitlist state for membership
+  const [waitName, setWaitName] = useState('');
+  const [waitEmail, setWaitEmail] = useState('');
+  const [waitPhone, setWaitPhone] = useState('');
+  const [waitAddress, setWaitAddress] = useState('');
+  const [waitMessage, setWaitMessage] = useState('');
+  const [waitSuccess, setWaitSuccess] = useState('');
 
   // Smoothly scroll to section and mark active; close mobile menu when used
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
     e.preventDefault();
+  // If the user clicks Home, show About section instead (per request)
+  const mappedId = id === 'home' ? 'about' : id;
   // set active immediately so conditional rendering can show the section
-  setActiveSection(id);
+  setActiveSection(mappedId);
   setMenuOpen(false);
   // mark manual nav so the observer doesn't override our choice while scrolling
   manualNavRef.current = true;
     // update hash without jumping instantly
+    // keep the URL hash as #home when they click Home for compatibility
     history.replaceState(null, "", `#${id}`);
 
     // wait a tick for DOM updates (in case the target was conditionally rendered), then scroll
@@ -43,7 +53,7 @@ export default function Home() {
 
   // Optional: update activeSection on scroll using IntersectionObserver
   useEffect(() => {
-    const ids = ["home", "events", "membership", "contact"];
+  const ids = ["home", "about", "events", "membership", "contact"];
     const observers: IntersectionObserver[] = [];
     ids.forEach((id) => {
       const el = document.getElementById(id);
@@ -82,6 +92,84 @@ export default function Home() {
     load();
     return () => { cancelled = true };
   }, []);
+
+  // Event helper functions and computed lists
+  function pad(n: number) { return n.toString().padStart(2, '0'); }
+
+  function toGoogleDate(d: Date) {
+    // YYYYMMDDTHHMMSSZ in UTC
+    const y = d.getUTCFullYear();
+    const m = pad(d.getUTCMonth() + 1);
+    const day = pad(d.getUTCDate());
+    const hh = pad(d.getUTCHours());
+    const mm = pad(d.getUTCMinutes());
+    const ss = pad(d.getUTCSeconds());
+    return `${y}${m}${day}T${hh}${mm}${ss}Z`;
+  }
+
+  function formatLocal(d: Date) {
+    return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  function getGoogleUrl(ev: any) {
+    const start = toGoogleDate(ev.start);
+    const end = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
+    const text = encodeURIComponent(ev.title);
+    const details = encodeURIComponent(ev.description || '');
+    const location = encodeURIComponent('Cromwell Fish & Game Club');
+    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=true&output=xml`;
+  }
+
+  function buildICS(ev: any) {
+    const dtstamp = toGoogleDate(new Date());
+    const dtstart = toGoogleDate(ev.start);
+    const dtend = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
+    const uid = `${ev.id}@cromwellfgc.local`;
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Cromwell FGC//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${dtstamp}`,
+      `DTSTART:${dtstart}`,
+      `DTEND:${dtend}`,
+      `SUMMARY:${ev.title}`,
+      `DESCRIPTION:${ev.description || ''}`,
+      `LOCATION:Cromwell Fish & Game Club`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+
+  function downloadICS(ev: any) {
+    const ics = buildICS(ev);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${ev.id}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  const eventsComputed = useMemo(() => {
+    const defaultYear = new Date().getFullYear();
+    const defaults = [
+      { id: 'oct-meeting', title: 'October Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 9, 2, 18, 30), durationMinutes: 60 },
+      { id: 'annual', title: 'Annual Member Meeting', description: 'Annual meeting for members', start: new Date(defaultYear, 9, 2, 19, 0), durationMinutes: 90 },
+      { id: 'nov-meeting', title: 'November Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 10, 6, 18, 30), durationMinutes: 60 },
+    ];
+    const events = eventsData && eventsData.length ? eventsData : defaults;
+    const now = new Date();
+    const upcoming = events.filter((e: any) => new Date(e.start) >= now);
+    const past = events.filter((e: any) => new Date(e.start) < now);
+    const shown = showPast ? [...upcoming, ...past] : upcoming;
+    return { events, upcoming, past, shown };
+  }, [eventsData, showPast]);
 
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
@@ -142,21 +230,16 @@ export default function Home() {
 
       {/* About Us Section */}
       {(activeSection === "home" || activeSection === "about") && (
-        <section id="about" className="max-w-6xl mx-auto px-4 sm:px-8 py-12">
-          <div className="grid gap-8 md:grid-cols-2 items-center">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-semibold mb-4">About Us</h2>
-              <p className="mb-4 text-gray-700">
-                Cromwell Fish & Game Club is a community-run organization dedicated to promoting responsible outdoor recreation,
-                conservation, and education. Our members enjoy regular meetings, youth events, and habitat stewardship projects.
-              </p>
-              <p className="text-gray-700">
-                We welcome hunters, anglers, and anyone interested in learning outdoor skills or supporting local conservation efforts.
-              </p>
-            </div>
-            <div className="rounded overflow-hidden shadow">
-              <img src="/file.svg" alt="Club activities" className="w-full h-56 object-cover" />
-            </div>
+        <section id="about" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
+          <div className="text-center">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-4">About Us</h2>
+            <p className="mb-4 text-gray-700">
+              Cromwell Fish & Game Club is a community-run organization dedicated to promoting responsible outdoor recreation,
+              conservation, and education. Our members enjoy regular meetings, youth events, and habitat stewardship projects.
+            </p>
+            <p className="text-gray-700">
+              We welcome hunters, anglers, and anyone interested in learning outdoor skills or supporting local conservation efforts.
+            </p>
           </div>
         </section>
       )}
@@ -167,113 +250,78 @@ export default function Home() {
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
           {/* Event cards */}
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-700">Showing {events.length} event{events.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-gray-700">Showing {eventsComputed.shown.length} event{eventsComputed.shown.length !== 1 ? 's' : ''}</p>
             <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">{showPast ? 'Hide past events' : 'Show past events'}</button>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
-            {(() => {
-              const defaultYear = new Date().getFullYear();
-              const defaults = [
-                { id: 'oct-meeting', title: 'October Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 9, 2, 18, 30), durationMinutes: 60 },
-                { id: 'annual', title: 'Annual Member Meeting', description: 'Annual meeting for members', start: new Date(defaultYear, 9, 2, 19, 0), durationMinutes: 90 },
-                { id: 'nov-meeting', title: 'November Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 10, 6, 18, 30), durationMinutes: 60 },
-              ];
-              const events = eventsData && eventsData.length ? eventsData : defaults;
-              const now = new Date();
-              const upcoming = events.filter((e: any) => new Date(e.start) >= now);
-              const past = events.filter((e: any) => new Date(e.start) < now);
-              const shown = showPast ? [...upcoming, ...past] : upcoming;
-
-              function pad(n: number) { return n.toString().padStart(2, '0'); }
-
-              function toGoogleDate(d: Date) {
-                // YYYYMMDDTHHMMSSZ in UTC
-                const y = d.getUTCFullYear();
-                const m = pad(d.getUTCMonth() + 1);
-                const day = pad(d.getUTCDate());
-                const hh = pad(d.getUTCHours());
-                const mm = pad(d.getUTCMinutes());
-                const ss = pad(d.getUTCSeconds());
-                return `${y}${m}${day}T${hh}${mm}${ss}Z`;
-              }
-
-              function formatLocal(d: Date) {
-                return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-              }
-
-              function getGoogleUrl(ev: any) {
-                const start = toGoogleDate(ev.start);
-                const end = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
-                const text = encodeURIComponent(ev.title);
-                const details = encodeURIComponent(ev.description || '');
-                const location = encodeURIComponent('Cromwell Fish & Game Club');
-                return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=true&output=xml`;
-              }
-
-              function buildICS(ev: any) {
-                const dtstamp = toGoogleDate(new Date());
-                const dtstart = toGoogleDate(ev.start);
-                const dtend = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
-                const uid = `${ev.id}@cromwellfgc.local`;
-                return [
-                  'BEGIN:VCALENDAR',
-                  'VERSION:2.0',
-                  'PRODID:-//Cromwell FGC//EN',
-                  'CALSCALE:GREGORIAN',
-                  'BEGIN:VEVENT',
-                  `UID:${uid}`,
-                  `DTSTAMP:${dtstamp}`,
-                  `DTSTART:${dtstart}`,
-                  `DTEND:${dtend}`,
-                  `SUMMARY:${ev.title}`,
-                  `DESCRIPTION:${ev.description || ''}`,
-                  `LOCATION:Cromwell Fish & Game Club`,
-                  'END:VEVENT',
-                  'END:VCALENDAR',
-                ].join('\r\n');
-              }
-
-              function downloadICS(ev: any) {
-                const ics = buildICS(ev);
-                const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${ev.id}.ics`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-              }
-
-              return shown.map((ev) => (
-                <article key={ev.id} className="bg-white rounded shadow p-4 border-l-4 border-green-800">
-                  <h3 className="text-lg font-semibold text-green-900">{ev.title}</h3>
-                  <p className="text-sm text-green-700 mb-2">{formatLocal(ev.start)} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
-                  <p className="text-sm mb-3 text-gray-700">{ev.description}</p>
-                  <div className="flex gap-3">
-                    <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-800 text-white px-3 py-2 rounded hover:bg-green-700">Add to Google Calendar</a>
-                    <button onClick={() => downloadICS(ev)} className="inline-block bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500">Download .ics</button>
-                  </div>
-                </article>
-              ));
-            })()}
+            {eventsComputed.shown.map((ev: any) => (
+              <article key={ev.id} className="bg-white rounded shadow p-4 border-l-4 border-green-800">
+                <h3 className="text-lg font-semibold text-green-900">{ev.title}</h3>
+                <p className="text-sm text-green-700 mb-2">{formatLocal(new Date(ev.start))} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
+                <p className="text-sm mb-3 text-gray-700">{ev.description}</p>
+                <div className="flex gap-3">
+                  <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-800 text-white px-3 py-2 rounded hover:bg-green-700">Add to Google Calendar</a>
+                  <button onClick={() => downloadICS(ev)} className="inline-block bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500">Download .ics</button>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
       )}
 
       {(activeSection === "home" || activeSection === "membership") && (
-        <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Become a Member</h2>
-          <p className="mb-6 max-w-2xl mx-auto">
-            Membership gives you access to our club facilities, events, and the chance to join a community of outdoor enthusiasts.
-          </p>
-          <a
-            href="#contact"
-            className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition"
-          >
-            Join Now
-          </a>
+        <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Membership (Currently Full)</h2>
+            <p className="mb-4 text-gray-700">
+              Our membership is currently at capacity. We appreciate your interest — we maintain a wait list and will contact
+              interested individuals as spots become available.
+            </p>
+            <p className="mb-6 text-gray-700">
+              Please join the wait list below and we'll notify you by email when a place opens up.
+            </p>
+
+            <form className="grid gap-3 sm:grid-cols-1 mb-4" onSubmit={async (e) => {
+              e.preventDefault();
+              setWaitSuccess('');
+              // simple address validation: require at least 5 characters if provided and contain a number (street number)
+              if (waitAddress) {
+                const addrTrim = waitAddress.trim();
+                if (addrTrim.length < 5 || !/\d/.test(addrTrim)) {
+                  setWaitSuccess('Please enter a valid address (include street number).');
+                  return;
+                }
+              }
+
+              try {
+                const res = await fetch('/api/waitlist', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ name: waitName, email: waitEmail, phone: waitPhone, address: waitAddress, message: waitMessage }),
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json?.error || 'Submission failed');
+                setWaitSuccess('Thanks — you have been added to the wait list.');
+                // clear the form
+                setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitMessage('');
+              } catch (err: any) {
+                setWaitSuccess(`Error: ${err?.message || 'Could not submit'}`);
+              }
+            }}>
+              <input className="w-full px-3 py-2 rounded border" placeholder="Full name" value={waitName} onChange={(e) => setWaitName(e.target.value)} required />
+              <input className="w-full px-3 py-2 rounded border" placeholder="Email address" type="email" value={waitEmail} onChange={(e) => setWaitEmail(e.target.value)} required />
+              <input className="w-full px-3 py-2 rounded border" placeholder="Phone number" type="tel" value={waitPhone} onChange={(e) => setWaitPhone(e.target.value)} />
+              <input className="w-full px-3 py-2 rounded border" placeholder="Address (optional, include street number)" value={waitAddress} onChange={(e) => setWaitAddress(e.target.value)} />
+              <textarea className="w-full px-3 py-2 rounded border" placeholder="Optional message (interests/notes)" value={waitMessage} onChange={(e) => setWaitMessage(e.target.value)} rows={3} />
+              <div className="flex items-center justify-center gap-3">
+                <button type="submit" className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition">Join the Wait List</button>
+                <button type="button" onClick={() => { setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitMessage(''); setWaitSuccess(''); }} className="text-sm text-gray-700 underline">Clear</button>
+              </div>
+            </form>
+
+            {waitSuccess && <p className="text-sm text-green-800">{waitSuccess}</p>}
+            <p className="mt-6 text-sm text-gray-600">Questions? Email <a href="mailto:cromwellfgc@gmail.com" className="underline text-green-900">cromwellfgc@gmail.com</a>.</p>
+          </div>
         </section>
       )}
 
