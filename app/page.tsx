@@ -301,7 +301,13 @@ export default function Home() {
                 });
                 const json = await res.json();
                 if (!res.ok) throw new Error(json?.error || 'Submission failed');
-                setWaitSuccess('Thanks — you have been added to the wait list.');
+                if (json.fallback) {
+                  setWaitSuccess(`Thanks — added to wait list (stored temporarily).`);
+                } else if (json.persistedTo) {
+                  setWaitSuccess('Thanks — you have been added to the wait list.');
+                } else {
+                  setWaitSuccess('Thanks — you have been added to the wait list.');
+                }
                 // clear the form
                 setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitMessage('');
               } catch (err: any) {
@@ -326,46 +332,9 @@ export default function Home() {
       )}
 
       {(activeSection === "home" || activeSection === "contact") && (
-        <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-semibold mb-4 text-center">Contact Us</h2>
-            <p className="mb-4 text-center text-gray-700">Have a question? Send us a message and we'll get back to you.</p>
-
-            <form className="grid gap-3" onSubmit={async (e) => {
-              e.preventDefault();
-              const target = e.target as HTMLFormElement;
-              const formData = new FormData(target);
-              const payload = {
-                name: String(formData.get('name') || ''),
-                email: String(formData.get('email') || ''),
-                subject: String(formData.get('subject') || ''),
-                message: String(formData.get('message') || ''),
-              };
-
-              try {
-                const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const json = await res.json();
-                if (!res.ok) throw new Error(json?.error || 'Send failed');
-                if (json.fallback && json.fallback.mailto) {
-                  // open mail client fallback
-                  window.location.href = json.fallback.mailto;
-                  return;
-                }
-                alert('Message sent — thank you!');
-                target.reset();
-              } catch (err: any) {
-                alert('Error sending message: ' + (err?.message || 'unknown'));
-              }
-            }}>
-              <input name="name" className="w-full px-3 py-2 rounded border" placeholder="Your name" required />
-              <input name="email" type="email" className="w-full px-3 py-2 rounded border" placeholder="Your email" required />
-              <input name="subject" className="w-full px-3 py-2 rounded border" placeholder="Subject" required />
-              <textarea name="message" rows={5} className="w-full px-3 py-2 rounded border" placeholder="Message" required />
-              <div className="text-center">
-                <button type="submit" className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700">Send Message</button>
-              </div>
-            </form>
-          </div>
+        <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
+          <p className="mb-4">Email: <a href="mailto:cromwellfgc@gmail.com" aria-label="Email Cromwell Fish and Game Club" className="text-green-900 underline hover:text-green-700">cromwellfgc@gmail.com</a></p>
         </section>
       )}
 

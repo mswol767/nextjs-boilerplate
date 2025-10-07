@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import os from 'os';
 
 type WaitEntry = {
   id: string;
@@ -13,18 +14,57 @@ type WaitEntry = {
 };
 
 async function readStore(filePath: string) {
+  // Read primary store (may fail on read-only FS)
+  let primary: WaitEntry[] = [];
   try {
     const raw = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(raw) as WaitEntry[];
+    primary = JSON.parse(raw) as WaitEntry[];
   } catch (err) {
-    return [];
+    primary = [];
   }
+
+  // Also read tmp fallback store if present and merge unique entries
+  let tmp: WaitEntry[] = [];
+  try {
+    const tmpPath = path.join(os.tmpdir(), 'waitlist.json');
+    const raw2 = await fs.readFile(tmpPath, 'utf8');
+    tmp = JSON.parse(raw2) as WaitEntry[];
+  } catch (e) {
+    tmp = [];
+  }
+
+  // Merge by id (primary first, then any tmp entries not present)
+  const seen = new Set<string>();
+  const merged: WaitEntry[] = [];
+  for (const e of primary) {
+    seen.add(e.id);
+    merged.push(e);
+  }
+  for (const e of tmp) {
+    if (!seen.has(e.id)) {
+      merged.push(e);
+      seen.add(e.id);
+    }
+  }
+  return merged;
 }
 
 async function writeStore(filePath: string, data: WaitEntry[]) {
   const dir = path.dirname(filePath);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+  try {
+    await fs.mkdir(dir, { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+    return { path: filePath };
+  } catch (err: any) {
+    // If filesystem is read-only (common on some serverless platforms), fall back to tmp dir
+    if (err && (err.code === 'EROFS' || err.code === 'EACCES' || err.code === 'EPERM')) {
+      const tmpPath = path.join(os.tmpdir(), 'waitlist.json');
+      await fs.writeFile(tmpPath, JSON.stringify(data, null, 2), 'utf8');
+      return { path: tmpPath, fallback: true };
+    }
+    // rethrow other errors
+    throw err;
+  }
 }
 
 export async function GET(req: Request) {
@@ -32,7 +72,7 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const download = url.searchParams.get('download');
     const storePath = path.join(process.cwd(), 'data', 'waitlist.json');
-    const store = await readStore(storePath);
+  const store = await readStore(storePath);
 
     if (download === 'csv') {
       // build CSV
@@ -82,9 +122,10 @@ export async function POST(req: Request) {
     const storePath = path.join(process.cwd(), 'data', 'waitlist.json');
     const store = await readStore(storePath);
     store.push(entry);
-    await writeStore(storePath, store);
+    const writeResult = await writeStore(storePath, store);
 
-    return NextResponse.json({ ok: true, entry });
+    // Inform caller where we persisted (or if it fell back to tmp)
+    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback });
   } catch (err: any) {
     console.error('waitlist POST error', err);
     return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
