@@ -2,6 +2,18 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
+// Dynamically import google APIs when needed
+let googleSheets: any = null;
+async function getGoogleSheets() {
+  if (googleSheets) return googleSheets;
+  try {
+    const { google } = await import('googleapis');
+    googleSheets = google.sheets('v4');
+    return googleSheets;
+  } catch (err) {
+    return null;
+  }
+}
 
 type WaitEntry = {
   id: string;
@@ -122,10 +134,63 @@ export async function POST(req: Request) {
     const storePath = path.join(process.cwd(), 'data', 'waitlist.json');
     const store = await readStore(storePath);
     store.push(entry);
+    // If a Google Apps Script web-app URL is provided, try forwarding the entry there first.
+    // This lets you deploy a small Apps Script (owned by your Gmail) that appends rows to a sheet.
+    const webAppUrl = process.env.WEB_APP_URL;
+    // If Google Sheets configured, try to append there (service-account) as a fallback
+    const sheetId = process.env.SHEET_ID;
+    const saJsonBase64 = process.env.GOOGLE_SERVICE_ACCOUNT;
+    let sheetAppended = false;
+
+    if (webAppUrl) {
+      try {
+        const resp = await fetch(webAppUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entry }),
+        });
+        if (resp.ok) {
+          sheetAppended = true;
+        } else {
+          console.error('Web-app append failed, status', resp.status, await resp.text());
+        }
+      } catch (err: any) {
+        console.error('Web-app append error', err?.message || err);
+      }
+    }
+
+    // If web-app wasn't used or failed, try the service-account Sheets append when configured
+    if (!sheetAppended && sheetId && saJsonBase64) {
+      try {
+        const sheets = await getGoogleSheets();
+        if (sheets) {
+          const keyJson = Buffer.from(saJsonBase64, 'base64').toString('utf8');
+          const auth = new (await import('google-auth-library')).JWT({
+            email: JSON.parse(keyJson).client_email,
+            key: JSON.parse(keyJson).private_key,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+          });
+          await auth.authorize();
+          await sheets.spreadsheets.values.append({
+            spreadsheetId: sheetId,
+            range: 'Sheet1!A:G',
+            valueInputOption: 'RAW',
+            requestBody: {
+              values: [[entry.id, entry.name, entry.email, entry.phone || '', entry.address || '', entry.message || '', entry.createdAt]]
+            },
+            auth,
+          });
+          sheetAppended = true;
+        }
+      } catch (err: any) {
+        console.error('Sheets append failed, falling back to file:', err?.message || err);
+      }
+    }
+
     const writeResult = await writeStore(storePath, store);
 
-    // Inform caller where we persisted (or if it fell back to tmp)
-    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback });
+    // Inform caller where we persisted (or if it fell back to tmp) and sheet status
+    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback, sheetAppended });
   } catch (err: any) {
     console.error('waitlist POST error', err);
     return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });

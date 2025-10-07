@@ -186,7 +186,7 @@ export default function Home() {
           </button>
           {/* Desktop Menu */}
           <nav className="hidden sm:flex gap-6 text-lg font-medium">
-            <a href="#home" onClick={(e) => handleNavClick(e, "home")} className={`hover:underline ${activeSection === "home" ? "underline decoration-2" : ""}`}>Home</a>
+            <a href="#home" onClick={(e) => handleNavClick(e, "home")} className={`hover:underline ${activeSection === "home" ? "underline decoration-2" : ""}`}>About Us</a>
             <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}>Events</a>
             <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}>Membership</a>
             <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>Contact</a>
@@ -203,7 +203,7 @@ export default function Home() {
         {/* Mobile Menu */}
         {menuOpen && (
           <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
-            <a href="#home" className={`hover:underline ${activeSection === "home" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "home")}>Home</a>
+            <a href="#home" className={`hover:underline ${activeSection === "home" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "home")}>About Us</a>
             <a href="#events" className={`hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}>Events</a>
             <a href="#membership" className={`hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}>Membership</a>
             <a href="#contact" className={`hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>Contact</a>
