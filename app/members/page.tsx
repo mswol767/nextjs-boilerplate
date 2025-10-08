@@ -2,9 +2,9 @@ import Login from '../admin/Login';
 import { cookies } from 'next/headers';
 import SignOutButton from '../../components/SignOutButton';
 
-export default function MembersPage() {
+export default async function MembersPage() {
   // Check the admin_auth cookie server-side
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const auth = cookieStore.get('admin_auth');
 
   // If not authenticated, render the client Login form so they can sign in
