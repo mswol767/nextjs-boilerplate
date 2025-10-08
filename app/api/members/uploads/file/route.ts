@@ -19,7 +19,8 @@ export async function GET(req: Request) {
   const data = await fs.readFile(filePath);
   // convert Node Buffer to Uint8Array for Web Response compatibility
   const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-  return new Response(uint8, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${name}"` } });
+  // cast to any to satisfy TypeScript BodyInit typing
+  return new Response(uint8 as any, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${name}"` } });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'not found' }, { status: 404 });
   }
