@@ -17,9 +17,11 @@ export async function GET(req: Request) {
     if (!name) return NextResponse.json({ ok: false, error: 'Missing name' }, { status: 400 });
     const filePath = path.join(TMP_DIR, name);
     const data = await fs.readFile(filePath);
-    // convert Node Buffer to Uint8Array and then to a Blob for Web Response compatibility
-    const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-    const blob = new Blob([uint8], { type: 'application/pdf' });
+  // convert Node Buffer to Uint8Array and copy into a fresh ArrayBuffer-backed Uint8Array
+  const srcArr = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  const copy = new Uint8Array(srcArr.length);
+  copy.set(srcArr);
+  const blob = new Blob([copy.buffer], { type: 'application/pdf' });
     return new Response(blob, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${name}"` } });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'not found' }, { status: 404 });
