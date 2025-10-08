@@ -1,4 +1,4 @@
-import Login from '../../admin/Login';
+import Login from '../admin/Login';
 import { cookies } from 'next/headers';
 import SignOutButton from '../../components/SignOutButton';
 
