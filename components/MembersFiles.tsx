@@ -60,7 +60,7 @@ export default function MembersFiles() {
           <div key={f.name} className="flex items-center justify-between bg-white p-3 rounded border">
             <div>
               <a href={f.url} target="_blank" rel="noopener noreferrer" className="text-green-800 underline">{f.name}</a>
-              <div className="text-xs text-gray-500">{new Date(f.createdAt).toLocaleString()} {f.fallback ? '(stored temporarily)' : ''}</div>
+              {f.fallback && <div className="text-xs text-gray-500">(stored temporarily)</div>}
             </div>
             <div className="text-sm text-gray-600">{(f.size/1024).toFixed(1)} KB</div>
           </div>
