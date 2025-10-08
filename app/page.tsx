@@ -382,7 +382,7 @@ export default function Home() {
             </form>
 
             {waitSuccess && <p className="text-sm text-green-800">{waitSuccess}</p>}
-            <p className="mt-6 text-sm text-gray-600">Questions? Email <a href="mailto:cromwellfgc@gmail.com" className="underline text-green-900">cromwellfgc@gmail.com</a>.</p>
+            <p className="mt-6 text-sm text-gray-600">Questions? Use the contact form above or visit the <a href="/contact" className="underline text-green-900">Contact page</a>.</p>
           </div>
         </section>
       )}
