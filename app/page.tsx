@@ -236,7 +236,12 @@ export default function Home() {
             <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}>Events</a>
             <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}>Membership</a>
             <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>Contact</a>
-            <a href="/members" className="hover:underline">Members</a>
+            <a href="/members" title="Members only — staff and members" className="flex items-center gap-2 text-sm text-white/70 hover:text-white/90">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/60" aria-hidden>
+                <path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor" />
+              </svg>
+              <span>Members</span>
+            </a>
           </nav>
         </div>
         {/* Show all button when in single-section view */}
@@ -254,7 +259,12 @@ export default function Home() {
             <a href="#events" className={`hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}>Events</a>
             <a href="#membership" className={`hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}>Membership</a>
             <a href="#contact" className={`hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>Contact</a>
-            <a href="/members" className="hover:underline">Members</a>
+            <a href="/members" title="Members only — staff and members" className="flex items-center gap-2 text-sm text-white/80">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/60" aria-hidden>
+                <path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor" />
+              </svg>
+              <span>Members</span>
+            </a>
           </nav>
         )}
       </header>
