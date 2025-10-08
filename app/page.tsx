@@ -235,8 +235,14 @@ export default function Home() {
             <a href="#home" onClick={(e) => handleNavClick(e, "home")} className={`flex items-center gap-2 hover:underline ${activeSection === "home" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/></svg><span>About</span></a>
             <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`flex items-center gap-2 hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M7 10h10v6H7z" fill="currentColor"/><path d="M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1" stroke="currentColor" strokeWidth="0"/></svg><span>Events</span></a>
             <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`flex items-center gap-2 hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" fill="currentColor"/></svg><span>Membership</span></a>
-            <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M2 4h20v16H2z" fill="currentColor"/></svg><span>Contact</span></a>
-            <a href="/members" title="Members only — staff and members" className="flex items-center gap-2 text-sm text-white/70 hover:text-white/90"><svg className="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none"><path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/></svg><span>Members</span></a>
+            <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z" fill="currentColor"/></svg>
+              <span>Contact</span>
+            </a>
+            <a href="/members" title="Members only — staff and members" className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline decoration-2" : ""}`}>
+              <svg className="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/></svg>
+              <span>Members</span>
+            </a>
           </nav>
         </div>
         {/* Show all button when in single-section view */}
@@ -253,8 +259,14 @@ export default function Home() {
             <a href="#home" className={`flex items-center gap-2 hover:underline ${activeSection === "home" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "home")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/></svg><span>About</span></a>
             <a href="#events" className={`flex items-center gap-2 hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M7 10h10v6H7z" fill="currentColor"/><path d="M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1" stroke="currentColor" strokeWidth="0"/></svg><span>Events</span></a>
             <a href="#membership" className={`flex items-center gap-2 hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" fill="currentColor"/></svg><span>Membership</span></a>
-            <a href="#contact" className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M2 4h20v16H2z" fill="currentColor"/></svg><span>Contact</span></a>
-            <a href="/members" className="flex items-center gap-2 hover:underline">Members</a>
+            <a href="#contact" className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z" fill="currentColor"/></svg>
+              <span>Contact</span>
+            </a>
+            <a href="/members" className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline" : ""}`}>
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/></svg>
+              <span>Members</span>
+            </a>
           </nav>
         )}
       </header>
