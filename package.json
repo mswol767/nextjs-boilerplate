@@ -6,7 +6,8 @@
   "dev": "next dev --turbopack",
   "build": "next build --turbopack",
   "start": "next start",
-  "prune-events": "node scripts/prune-events.js"
+  "prune-events": "node scripts/prune-events.js",
+  "import-pdfs": "node scripts/import-pdfs.js"
   },
   "dependencies": {
     "react": "19.1.0",
