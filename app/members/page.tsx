@@ -1,6 +1,7 @@
 import Login from '../admin/Login';
 import { cookies } from 'next/headers';
 import SignOutButton from '../../components/SignOutButton';
+import MembersFiles from '../../components/MembersFiles';
 
 export default async function MembersPage() {
   // Check the admin_auth cookie server-side
@@ -33,9 +34,15 @@ export default async function MembersPage() {
 
         <p className="mt-4 text-gray-700">Welcome to the members-only section. Add your exclusive content here (events, documents, member resources).</p>
 
+        {/* Members files upload/list component */}
         <section className="mt-6">
-          <h2 className="text-lg font-semibold mb-2">Upcoming members events</h2>
-          <p className="text-sm text-gray-600">(This is placeholder content. Replace with real members-only content.)</p>
+          <h2 className="text-lg font-semibold mb-2">Resources</h2>
+          <p className="text-sm text-gray-600 mb-4">Meeting minutes and member documents (PDF).</p>
+          {/* Client component for uploading/listing PDFs */}
+          {/* @ts-ignore client component import allowed in server component */}
+          <script type="module" dangerouslySetInnerHTML={{ __html: '' }} />
+          {/* The actual client component is imported below via dynamic client rendering */}
+          <MembersFiles />
         </section>
       </div>
     </div>
