@@ -17,10 +17,9 @@ export async function GET(req: Request) {
     if (!name) return NextResponse.json({ ok: false, error: 'Missing name' }, { status: 400 });
     const filePath = path.join(TMP_DIR, name);
   const data = await fs.readFile(filePath);
-  // convert Node Buffer to Uint8Array for Web Response compatibility
-  const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-  // cast to any to satisfy TypeScript BodyInit typing
-  return new Response(uint8 as any, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${name}"` } });
+  // convert Node Buffer to an ArrayBuffer slice for Web Response compatibility
+  const arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+  return new Response(arrayBuffer, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${name}"` } });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'not found' }, { status: 404 });
   }
