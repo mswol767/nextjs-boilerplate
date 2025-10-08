@@ -236,6 +236,7 @@ export default function Home() {
             <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}>Events</a>
             <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}>Membership</a>
             <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>Contact</a>
+            <a href="/members" className="hover:underline">Members</a>
           </nav>
         </div>
         {/* Show all button when in single-section view */}
@@ -253,6 +254,7 @@ export default function Home() {
             <a href="#events" className={`hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}>Events</a>
             <a href="#membership" className={`hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}>Membership</a>
             <a href="#contact" className={`hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>Contact</a>
+            <a href="/members" className="hover:underline">Members</a>
           </nav>
         )}
       </header>
