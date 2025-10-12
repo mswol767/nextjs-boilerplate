@@ -2,42 +2,90 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { Event, ApiResponse } from '../../../types';
+import { getEventsConfig, DEFAULT_EVENTS } from './config';
 
 const EVENTS_FILE = path.join(process.cwd(), 'data', 'events.json');
 
-// Helper function to read events from file
-async function readEvents(): Promise<Event[]> {
-  try {
-    const data = await fs.readFile(EVENTS_FILE, 'utf8');
-    const events = JSON.parse(data);
-    // Convert start dates back to Date objects
-    return events.map((event: any) => ({
-      ...event,
-      start: new Date(event.start)
-    }));
-  } catch (error) {
-    // If file doesn't exist, return empty array
-    return [];
+// In-memory store for production environments
+let inMemoryEvents: Event[] = [];
+
+// Initialize with default events for serverless environments
+function initializeDefaultEvents(): void {
+  if (inMemoryEvents.length === 0) {
+    inMemoryEvents = [...DEFAULT_EVENTS];
   }
 }
 
-// Helper function to write events to file
+// Helper function to read events
+async function readEvents(): Promise<Event[]> {
+  const config = getEventsConfig();
+  
+  if (config.useInMemory) {
+    // In serverless, use in-memory store
+    return inMemoryEvents;
+  }
+
+  if (config.useFileSystem) {
+    try {
+      const data = await fs.readFile(EVENTS_FILE, 'utf8');
+      const events = JSON.parse(data);
+      // Convert start dates back to Date objects
+      return events.map((event: any) => ({
+        ...event,
+        start: new Date(event.start)
+      }));
+    } catch (error) {
+      // If file doesn't exist, return empty array
+      return [];
+    }
+  }
+
+  // Fallback to in-memory store
+  return inMemoryEvents;
+}
+
+// Helper function to write events
 async function writeEvents(events: Event[]): Promise<void> {
-  const dir = path.dirname(EVENTS_FILE);
-  await fs.mkdir(dir, { recursive: true });
+  const config = getEventsConfig();
   
-  // Convert Date objects to ISO strings for storage
-  const eventsForStorage = events.map(event => ({
-    ...event,
-    start: event.start.toISOString()
-  }));
-  
-  await fs.writeFile(EVENTS_FILE, JSON.stringify(eventsForStorage, null, 2), 'utf8');
+  if (config.useInMemory) {
+    // In serverless, update in-memory store
+    inMemoryEvents = events;
+    return;
+  }
+
+  if (config.useFileSystem) {
+    try {
+      const dir = path.dirname(EVENTS_FILE);
+      await fs.mkdir(dir, { recursive: true });
+      
+      // Convert Date objects to ISO strings for storage
+      const eventsForStorage = events.map(event => ({
+        ...event,
+        start: event.start.toISOString()
+      }));
+      
+      await fs.writeFile(EVENTS_FILE, JSON.stringify(eventsForStorage, null, 2), 'utf8');
+    } catch (error) {
+      console.error('Failed to write to file system, falling back to in-memory store:', error);
+      // Fallback to in-memory store if file system write fails
+      inMemoryEvents = events;
+    }
+  } else {
+    // Fallback to in-memory store
+    inMemoryEvents = events;
+  }
 }
 
 // GET - Retrieve all events
 export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
   try {
+    // Initialize default events if in serverless environment and store is empty
+    const config = getEventsConfig();
+    if (config.useInMemory) {
+      initializeDefaultEvents();
+    }
+    
     const events = await readEvents();
     return NextResponse.json({ 
       ok: true, 
