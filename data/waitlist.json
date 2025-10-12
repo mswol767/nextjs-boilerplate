@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1760301429870-7t6k3i",
+    "name": "Michael Swol",
+    "email": "mike.swol@gmail.com",
+    "phone": "8608839451",
+    "address": "83 Evergreen Road",
+    "town": "Cromwell",
+    "state": "CT",
+    "createdAt": "2025-10-12T20:37:09.870Z"
+  }
+]

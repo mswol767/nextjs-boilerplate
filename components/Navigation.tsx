@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import type { SectionId } from "../types";
 
 interface NavigationProps {
@@ -10,54 +11,154 @@ interface NavigationProps {
 }
 
 export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNavClick }: NavigationProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Track scroll position for header styling
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navItems = [
-    { id: "home", label: "About", icon: "M12 2L3 7v13h6v-7h6v7h6V7z" },
-    { id: "events", label: "Events", icon: "M7 10h10v6H7z M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1" },
-    { id: "membership", label: "Membership", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" },
-    { id: "contact", label: "Contact", icon: "M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z" }
+    { 
+      id: "home", 
+      label: "About", 
+      icon: "M12 2L3 7v13h6v-7h6v7h6V7z",
+      description: "Learn about our club"
+    },
+    { 
+      id: "events", 
+      label: "Events", 
+      icon: "M7 10h10v6H7z M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1",
+      description: "Upcoming activities"
+    },
+    { 
+      id: "membership", 
+      label: "Membership", 
+      icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1",
+      description: "Join our community"
+    },
+    { 
+      id: "contact", 
+      label: "Contact", 
+      icon: "M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z",
+      description: "Get in touch"
+    }
   ];
 
-  const NavLink = ({ id, label, icon, className = "" }: { id: string; label: string; icon: string; className?: string }) => (
-    <a 
-      href={`#${id}`} 
-      onClick={(e) => onNavClick(e, id)} 
-      className={`flex items-center gap-2 hover:underline ${activeSection === id ? "underline decoration-2" : ""} ${className}`}
-    >
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-        <path d={icon} fill="currentColor"/>
-      </svg>
-      <span>{label}</span>
-    </a>
-  );
+  const NavLink = ({ id, label, icon, description, className = "", isMobile = false }: { 
+    id: string; 
+    label: string; 
+    icon: string; 
+    description?: string;
+    className?: string;
+    isMobile?: boolean;
+  }) => {
+    const isActive = activeSection === id;
+    
+    return (
+      <a 
+        href={`#${id}`} 
+        onClick={(e) => onNavClick(e, id)} 
+        className={`
+          group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+          ${isActive 
+            ? "bg-green-700 text-white shadow-md" 
+            : "text-white/90 hover:text-white hover:bg-green-700/50"
+          }
+          ${isMobile ? "w-full" : ""}
+          ${className}
+        `}
+        title={description}
+      >
+        <svg 
+          className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-105"}`} 
+          viewBox="0 0 24 24" 
+          fill="none"
+        >
+          <path d={icon} fill="currentColor"/>
+        </svg>
+        <div className="flex flex-col">
+          <span className="font-medium">{label}</span>
+          {isMobile && description && (
+            <span className="text-xs text-white/70">{description}</span>
+          )}
+        </div>
+        {isActive && (
+          <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        )}
+      </a>
+    );
+  };
 
   return (
-    <header className={`bg-green-800 w-full text-white transition-all duration-500 overflow-hidden ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}`}>
+    <header className={`
+      fixed top-0 left-0 right-0 z-50 w-full text-white transition-all duration-300
+      ${isScrolled 
+        ? 'bg-green-900/95 backdrop-blur-sm shadow-lg' 
+        : 'bg-green-800'
+      }
+      ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}
+    `}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
-        <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
+        {/* Logo/Brand */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+            Cromwell Fish & Game Club
+          </h1>
+        </div>
         
         {/* Mobile menu button */}
         <button
-          className="sm:hidden text-white text-2xl"
+          className="sm:hidden relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-green-700/50 transition-colors"
           onClick={onMenuToggle}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
-          {menuOpen ? "✕" : "☰"}
+          <div className="w-5 h-5 flex flex-col justify-center">
+            <span className={`block h-0.5 w-5 bg-white transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-1' : '-translate-y-1'}`}></span>
+            <span className={`block h-0.5 w-5 bg-white transition-all duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
+            <span className={`block h-0.5 w-5 bg-white transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'}`}></span>
+          </div>
         </button>
         
         {/* Desktop Menu */}
-        <nav className="hidden sm:flex gap-6 text-lg font-medium">
+        <nav className="hidden sm:flex items-center gap-2">
           {navItems.map((item) => (
-            <NavLink key={item.id} id={item.id} label={item.label} icon={item.icon} />
+            <NavLink 
+              key={item.id} 
+              id={item.id} 
+              label={item.label} 
+              icon={item.icon}
+              description={item.description}
+            />
           ))}
           <a 
             href="/members" 
             title="Members only — staff and members" 
-            className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline decoration-2" : ""}`}
+            className={`
+              group flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200
+              ${activeSection === "members" 
+                ? "bg-green-700 text-white shadow-md" 
+                : "text-white/70 hover:text-white hover:bg-green-700/50"
+              }
+            `}
           >
-            <svg className="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
               <path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/>
             </svg>
-            <span>Members</span>
+            <span className="font-medium">Members</span>
+            {activeSection === "members" && (
+              <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            )}
           </a>
         </nav>
       </div>
@@ -67,29 +168,53 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         <div className="max-w-7xl mx-auto px-4 pb-2">
           <button 
             onClick={() => onNavClick({ preventDefault: () => {} } as any, "home")} 
-            className="text-sm text-white/90 hover:text-white underline"
+            className="group flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
           >
-            Show all
+            <svg className="w-4 h-4 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none">
+              <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Show all sections</span>
           </button>
         </div>
       )}
       
       {/* Mobile Menu */}
       {menuOpen && (
-        <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
-          {navItems.map((item) => (
-            <NavLink key={item.id} id={item.id} label={item.label} icon={item.icon} className="w-5 h-5" />
-          ))}
-          <a 
-            href="/members" 
-            className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline" : ""}`}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/>
-            </svg>
-            <span>Members</span>
-          </a>
-        </nav>
+        <div className="sm:hidden border-t border-green-700/50">
+          <nav className="flex flex-col gap-1 bg-green-700/50 p-4">
+            {navItems.map((item) => (
+              <NavLink 
+                key={item.id} 
+                id={item.id} 
+                label={item.label} 
+                icon={item.icon}
+                description={item.description}
+                isMobile={true}
+              />
+            ))}
+            <a 
+              href="/members" 
+              className={`
+                group flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 w-full
+                ${activeSection === "members" 
+                  ? "bg-green-700 text-white shadow-md" 
+                  : "text-white/90 hover:text-white hover:bg-green-700/50"
+                }
+              `}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/>
+              </svg>
+              <div className="flex flex-col">
+                <span className="font-medium">Members</span>
+                <span className="text-xs text-white/70">Staff and members only</span>
+              </div>
+              {activeSection === "members" && (
+                <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              )}
+            </a>
+          </nav>
+        </div>
       )}
     </header>
   );

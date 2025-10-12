@@ -58,10 +58,20 @@ export default function EventsManager() {
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
+    
+    // Convert date to local datetime-local format
+    const eventDate = new Date(event.start);
+    const year = eventDate.getFullYear();
+    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+    const day = String(eventDate.getDate()).padStart(2, '0');
+    const hours = String(eventDate.getHours()).padStart(2, '0');
+    const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+    const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    
     setFormData({
       title: event.title,
       description: event.description,
-      start: event.start.toISOString().slice(0, 16), // Format for datetime-local input
+      start: localDateTime,
       durationMinutes: event.durationMinutes
     });
     setShowForm(true);

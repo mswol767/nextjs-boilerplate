@@ -20,6 +20,9 @@ export default function Home() {
         onMenuToggle={() => setMenuOpen(!menuOpen)}
         onNavClick={handleNavClick}
       />
+      
+      {/* Add top padding to account for fixed header */}
+      <div className="pt-16 sm:pt-20">
 
       {/* Full-width Header Banner */}
       <section
@@ -104,11 +107,11 @@ export default function Home() {
         </section>
       )}
 
-
       {/* Footer */}
       <footer className="bg-green-800 text-white py-6 text-center">
         &copy; {new Date().getFullYear()} Cromwell Fish & Game Club. All rights reserved.
       </footer>
+      </div>
     </div>
   );
 }

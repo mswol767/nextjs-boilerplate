@@ -50,33 +50,36 @@ export function useEvents() {
   }, []);
 
   const eventsComputed = useMemo((): EventComputed => {
-    const defaultYear = new Date().getFullYear();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // Create upcoming events for the next few months
     const defaults: Event[] = [
       { 
-        id: 'oct-meeting', 
-        title: 'October Meeting', 
-        description: 'Monthly club meeting', 
-        start: new Date(defaultYear, 9, 2, 18, 30), 
-        durationMinutes: 60 
+        id: 'monthly-meeting', 
+        title: 'Monthly Club Meeting', 
+        description: 'Join us for our monthly club meeting to discuss upcoming events and club business.', 
+        start: new Date(currentYear, currentMonth + 1, 15, 19, 0), 
+        durationMinutes: 120 
       },
       { 
-        id: 'annual', 
-        title: 'Annual Member Meeting', 
-        description: 'Annual meeting for members', 
-        start: new Date(defaultYear, 9, 2, 19, 0), 
-        durationMinutes: 90 
+        id: 'hunting-season', 
+        title: 'Hunting Season Kickoff', 
+        description: 'Celebrate the start of hunting season with food, drinks, and planning sessions.', 
+        start: new Date(currentYear, currentMonth + 1, 20, 18, 0), 
+        durationMinutes: 180 
       },
       { 
-        id: 'nov-meeting', 
-        title: 'November Meeting', 
-        description: 'Monthly club meeting', 
-        start: new Date(defaultYear, 10, 6, 18, 30), 
-        durationMinutes: 60 
+        id: 'annual-banquet', 
+        title: 'Annual Club Banquet', 
+        description: 'Our annual celebration with awards, dinner, and entertainment for all members.', 
+        start: new Date(currentYear + 1, 0, 25, 17, 0), 
+        durationMinutes: 240 
       },
     ];
     
     const events = eventsData && eventsData.length ? eventsData : defaults;
-    const now = new Date();
     const upcoming = events.filter((e: Event) => new Date(e.start) >= now);
     const past = events.filter((e: Event) => new Date(e.start) < now);
     const shown = showPast ? [...upcoming, ...past] : upcoming;
