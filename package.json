@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "prune-events": "node scripts/prune-events.js",
     "import-pdfs": "node scripts/import-pdfs.js"
