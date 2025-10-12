@@ -3,6 +3,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import nodemailer from 'nodemailer';
+import type { WaitEntry, WaitlistFormData, WaitlistResponse } from '../../../types';
+
 // Dynamically import google APIs when needed
 let googleSheets: any = null;
 async function getGoogleSheets() {
@@ -15,18 +17,6 @@ async function getGoogleSheets() {
     return null;
   }
 }
-
-type WaitEntry = {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  town?: string;
-  state?: string;
-  message?: string;
-  createdAt: string;
-};
 
 async function readStore(filePath: string) {
   // Read primary store (may fail on read-only FS)
@@ -115,13 +105,16 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>> {
   try {
-  const body = await req.json();
-  const { name, email, phone, address, town, state, message } = body;
+    const body = await req.json();
+    const { name, email, phone, address, town, state, message }: WaitlistFormData = body;
 
     if (!name || !email) {
-      return NextResponse.json({ ok: false, error: 'Name and email are required' }, { status: 400 });
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Name and email are required' 
+      }, { status: 400 });
     }
 
     const entry: WaitEntry = {
@@ -226,9 +219,19 @@ export async function POST(req: Request) {
     }
 
     // Inform caller where we persisted (or if it fell back to tmp) and sheet status
-    return NextResponse.json({ ok: true, entry, persistedTo: writeResult.path, fallback: !!(writeResult as any).fallback, sheetAppended, mailed });
+    return NextResponse.json({ 
+      ok: true, 
+      entry, 
+      persistedTo: writeResult.path, 
+      fallback: !!(writeResult as any).fallback, 
+      sheetAppended, 
+      mailed 
+    });
   } catch (err: any) {
     console.error('waitlist POST error', err);
-    return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
+    return NextResponse.json({ 
+      ok: false, 
+      error: err?.message || 'unknown' 
+    }, { status: 500 });
   }
 }

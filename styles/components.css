@@ -1,0 +1,70 @@
+/* Button styles */
+.btn-primary {
+  @apply bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500 transition-colors;
+}
+
+.btn-clear {
+  @apply text-sm text-gray-700 underline hover:text-gray-900 transition-colors;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-3 py-2 rounded border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none;
+}
+
+.form-textarea {
+  @apply w-full px-3 py-2 rounded border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none resize-y;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded shadow p-4 border-l-4 border-green-800;
+}
+
+.card-header {
+  @apply text-lg font-semibold text-green-900 mb-2;
+}
+
+/* Status messages */
+.status-success {
+  @apply text-sm text-green-800;
+}
+
+.status-error {
+  @apply text-sm text-red-600;
+}
+
+/* Navigation styles */
+.nav-link {
+  @apply flex items-center gap-2 hover:underline transition-colors;
+}
+
+.nav-link.active {
+  @apply underline decoration-2;
+}
+
+/* Section styles */
+.section-container {
+  @apply max-w-4xl mx-auto px-4 sm:px-8 py-12;
+}
+
+.section-title {
+  @apply text-2xl sm:text-3xl font-semibold mb-6 text-center;
+}
+
+/* Grid layouts */
+.grid-responsive {
+  @apply grid gap-6 sm:grid-cols-2;
+}
+
+.grid-form {
+  @apply grid gap-3;
+}
+
+.grid-form-cols {
+  @apply grid sm:grid-cols-2 gap-3;
+}

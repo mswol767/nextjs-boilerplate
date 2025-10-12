@@ -37,10 +37,25 @@ export default function ClientPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto bg-white rounded shadow p-6">
-        <h1 className="text-2xl font-semibold mb-4">Waitlist Admin</h1>
-        <p className="mb-4">Entries received: {entries.length}</p>
-        <div className="mb-4">
-          <a href="/api/waitlist?download=csv" className="bg-green-800 text-white px-4 py-2 rounded">Download CSV</a>
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Waitlist Management</h1>
+            <p className="text-gray-600 mt-1">Entries received: {entries.length}</p>
+          </div>
+          <div className="flex gap-3">
+            <a 
+              href="/admin/events" 
+              className="btn-secondary"
+            >
+              Manage Events
+            </a>
+            <a 
+              href="/api/waitlist?download=csv" 
+              className="btn-primary"
+            >
+              Download CSV
+            </a>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

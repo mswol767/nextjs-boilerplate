@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-
-type FileEntry = { name: string; url: string; size: number; createdAt: string; fallback?: boolean };
+import type { FileEntry } from '../types';
 
 export default function MembersFiles() {
   const [files, setFiles] = useState<FileEntry[]>([]);

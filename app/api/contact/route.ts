@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
+import type { ContactFormData, ContactResponse } from '../../../types';
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<NextResponse<ContactResponse>> {
   try {
     const body = await req.json();
-    const { name, email, subject, message } = body;
+    const { name, email, subject, message }: ContactFormData = body;
+    
     if (!name || !email || !message) {
-      return NextResponse.json({ ok: false, error: 'Name, email and message are required' }, { status: 400 });
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Name, email and message are required' 
+      }, { status: 400 });
     }
 
     const smtpHost = process.env.SMTP_HOST;
@@ -33,14 +38,23 @@ export async function POST(req: Request) {
         replyTo: email,
       });
 
-      return NextResponse.json({ ok: true, mailed: true });
+      return NextResponse.json({ 
+        ok: true, 
+        mailed: true 
+      });
     }
 
     // No SMTP: return a mailto fallback so the client can open the user's mail client if desired
     const mailto = `mailto:${encodeURIComponent(emailTo)}?subject=${encodeURIComponent(subject || 'Website contact')}&body=${encodeURIComponent(`From: ${name} <${email}>\n\n${message}`)}`;
-    return NextResponse.json({ ok: false, fallback: { mailto } }, { status: 200 });
+    return NextResponse.json({ 
+      ok: false, 
+      fallback: { mailto } 
+    }, { status: 200 });
   } catch (err: any) {
     console.error('contact POST error', err);
-    return NextResponse.json({ ok: false, error: err?.message || 'unknown' }, { status: 500 });
+    return NextResponse.json({ 
+      ok: false, 
+      error: err?.message || 'unknown' 
+    }, { status: 500 });
   }
 }

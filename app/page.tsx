@@ -1,275 +1,25 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
-
-function ContactForm() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus('');
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      setStatus('Please provide your name, email, and a message.');
-      return;
-    }
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || 'Failed to send');
-      setStatus('Thanks — your message was sent.');
-      setName(''); setEmail(''); setSubject(''); setMessage('');
-    } catch (err: any) {
-      setStatus(`Error: ${err?.message || 'Could not send message'}`);
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="max-w-2xl mx-auto text-left grid gap-3">
-      <input className="w-full px-3 py-2 rounded border" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required />
-      <input className="w-full px-3 py-2 rounded border" placeholder="Your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input className="w-full px-3 py-2 rounded border" placeholder="Subject (optional)" value={subject} onChange={(e) => setSubject(e.target.value)} />
-      <textarea className="w-full px-3 py-2 rounded border" placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} rows={6} required />
-      <div className="flex items-center gap-3">
-        <button type="submit" className="bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700">Send Message</button>
-        <button type="button" onClick={() => { setName(''); setEmail(''); setSubject(''); setMessage(''); setStatus(''); }} className="text-sm text-gray-700 underline">Clear</button>
-      </div>
-      {status && <p className="mt-2 text-sm text-green-800">{status}</p>}
-    </form>
-  );
-}
+import Navigation from "../components/Navigation";
+import ContactForm from "../components/ContactForm";
+import WaitlistForm from "../components/WaitlistForm";
+import EventCard from "../components/EventCard";
+import { useNavigation } from "../hooks/useNavigation";
+import { useEvents } from "../hooks/useEvents";
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("about");
-  const manualNavRef = useRef(false);
-  const [eventsData, setEventsData] = useState<any[] | null>(null);
-  const [showPast, setShowPast] = useState(false);
-  // Waitlist state for membership
-  const [waitName, setWaitName] = useState('');
-  const [waitEmail, setWaitEmail] = useState('');
-  const [waitPhone, setWaitPhone] = useState('');
-  const [waitAddress, setWaitAddress] = useState('');
-  const [waitMessage, setWaitMessage] = useState('');
-  const [waitSuccess, setWaitSuccess] = useState('');
-  const [waitTown, setWaitTown] = useState('');
-  const [waitState, setWaitState] = useState('');
+  const { menuOpen, activeSection, setMenuOpen, setActiveSection, handleNavClick } = useNavigation();
+  const { eventsComputed, showPast, setShowPast } = useEvents();
 
-  // Smoothly scroll to section and mark active; close mobile menu when used
-  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, id: string) {
-    e.preventDefault();
-  // If the user clicks Home, show About section instead (per request)
-  const mappedId = id === 'home' ? 'about' : id;
-  // set active immediately so conditional rendering can show the section
-  setActiveSection(mappedId);
-  setMenuOpen(false);
-  // mark manual nav so the observer doesn't override our choice while scrolling
-  manualNavRef.current = true;
-    // update hash without jumping instantly
-    // keep the URL hash as #home when they click Home for compatibility
-    history.replaceState(null, "", `#${id}`);
-
-    // wait a tick for DOM updates (in case the target was conditionally rendered), then scroll
-    requestAnimationFrame(() => {
-      // small delay to ensure layout settled
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          // compute offset for header height so section isn't hidden under sticky header
-          const header = document.querySelector('header');
-          const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
-          const extraOffset = 12; // small breathing room
-          const top = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
-        // allow the observer to resume after the scroll finishes
-        setTimeout(() => {
-          manualNavRef.current = false;
-        }, 600);
-      }, 50);
-    });
-  }
-
-  // Optional: update activeSection on scroll using IntersectionObserver
-  useEffect(() => {
-  const ids = ["home", "about", "events", "membership", "contact"];
-    const observers: IntersectionObserver[] = [];
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !manualNavRef.current) setActiveSection(id);
-          });
-        },
-        { root: null, rootMargin: "-20% 0px -60% 0px", threshold: 0 }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
-
-  // Load events.json from public/ if available
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetch('/events.json');
-        if (!res.ok) throw new Error('no events.json');
-        const data = await res.json();
-        if (cancelled) return;
-        // convert start to Date
-        const parsed = data.map((e: any) => ({ ...e, start: new Date(e.start) }));
-        setEventsData(parsed);
-      } catch (err) {
-        // ignore, we'll use defaults
-        setEventsData(null);
-      }
-    }
-    load();
-    return () => { cancelled = true };
-  }, []);
-
-  // Event helper functions and computed lists
-  function pad(n: number) { return n.toString().padStart(2, '0'); }
-
-  function toGoogleDate(d: Date) {
-    // YYYYMMDDTHHMMSSZ in UTC
-    const y = d.getUTCFullYear();
-    const m = pad(d.getUTCMonth() + 1);
-    const day = pad(d.getUTCDate());
-    const hh = pad(d.getUTCHours());
-    const mm = pad(d.getUTCMinutes());
-    const ss = pad(d.getUTCSeconds());
-    return `${y}${m}${day}T${hh}${mm}${ss}Z`;
-  }
-
-  function formatLocal(d: Date) {
-    return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-  }
-
-  function getGoogleUrl(ev: any) {
-    const start = toGoogleDate(ev.start);
-    const end = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
-    const text = encodeURIComponent(ev.title);
-    const details = encodeURIComponent(ev.description || '');
-    const location = encodeURIComponent('Cromwell Fish & Game Club');
-    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=true&output=xml`;
-  }
-
-  function buildICS(ev: any) {
-    const dtstamp = toGoogleDate(new Date());
-    const dtstart = toGoogleDate(ev.start);
-    const dtend = toGoogleDate(new Date(ev.start.getTime() + ev.durationMinutes * 60000));
-    const uid = `${ev.id}@cromwellfgc.local`;
-    return [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Cromwell FGC//EN',
-      'CALSCALE:GREGORIAN',
-      'BEGIN:VEVENT',
-      `UID:${uid}`,
-      `DTSTAMP:${dtstamp}`,
-      `DTSTART:${dtstart}`,
-      `DTEND:${dtend}`,
-      `SUMMARY:${ev.title}`,
-      `DESCRIPTION:${ev.description || ''}`,
-      `LOCATION:Cromwell Fish & Game Club`,
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
-  }
-
-  function downloadICS(ev: any) {
-    const ics = buildICS(ev);
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${ev.id}.ics`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-  }
-
-  const eventsComputed = useMemo(() => {
-    const defaultYear = new Date().getFullYear();
-    const defaults = [
-      { id: 'oct-meeting', title: 'October Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 9, 2, 18, 30), durationMinutes: 60 },
-      { id: 'annual', title: 'Annual Member Meeting', description: 'Annual meeting for members', start: new Date(defaultYear, 9, 2, 19, 0), durationMinutes: 90 },
-      { id: 'nov-meeting', title: 'November Meeting', description: 'Monthly club meeting', start: new Date(defaultYear, 10, 6, 18, 30), durationMinutes: 60 },
-    ];
-    const events = eventsData && eventsData.length ? eventsData : defaults;
-    const now = new Date();
-    const upcoming = events.filter((e: any) => new Date(e.start) >= now);
-    const past = events.filter((e: any) => new Date(e.start) < now);
-    const shown = showPast ? [...upcoming, ...past] : upcoming;
-    return { events, upcoming, past, shown };
-  }, [eventsData, showPast]);
 
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
-      {/* Navigation */}
-  <header className={`bg-green-800 w-full text-white transition-all duration-500 overflow-hidden ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
-          <h1 className="text-xl sm:text-2xl font-bold">Cromwell Fish & Game Club</h1>
-          {/* Mobile menu button */}
-          <button
-            className="sm:hidden text-white text-2xl"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
-          {/* Desktop Menu */}
-          <nav className="hidden sm:flex gap-6 text-lg font-medium">
-            <a href="#home" onClick={(e) => handleNavClick(e, "home")} className={`flex items-center gap-2 hover:underline ${activeSection === "home" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/></svg><span>About</span></a>
-            <a href="#events" onClick={(e) => handleNavClick(e, "events")} className={`flex items-center gap-2 hover:underline ${activeSection === "events" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M7 10h10v6H7z" fill="currentColor"/><path d="M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1" stroke="currentColor" strokeWidth="0"/></svg><span>Events</span></a>
-            <a href="#membership" onClick={(e) => handleNavClick(e, "membership")} className={`flex items-center gap-2 hover:underline ${activeSection === "membership" ? "underline decoration-2" : ""}`}><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" fill="currentColor"/></svg><span>Membership</span></a>
-            <a href="#contact" onClick={(e) => handleNavClick(e, "contact")} className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline decoration-2" : ""}`}>
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z" fill="currentColor"/></svg>
-              <span>Contact</span>
-            </a>
-            <a href="/members" title="Members only — staff and members" className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline decoration-2" : ""}`}>
-              <svg className="w-4 h-4 text-white/60" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/></svg>
-              <span>Members</span>
-            </a>
-          </nav>
-        </div>
-        {/* Show all button when in single-section view */}
-        {activeSection !== 'home' && (
-          <div className="max-w-7xl mx-auto px-4 pb-2">
-            <button onClick={() => setActiveSection('home')} className="text-sm text-white/90 hover:text-white underline">
-              Show all
-            </button>
-          </div>
-        )}
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <nav className="sm:hidden flex flex-col gap-4 bg-green-700 p-4 text-lg">
-            <a href="#home" className={`flex items-center gap-2 hover:underline ${activeSection === "home" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "home")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/></svg><span>About</span></a>
-            <a href="#events" className={`flex items-center gap-2 hover:underline ${activeSection === "events" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "events")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M7 10h10v6H7z" fill="currentColor"/><path d="M17 3h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h1" stroke="currentColor" strokeWidth="0"/></svg><span>Events</span></a>
-            <a href="#membership" className={`flex items-center gap-2 hover:underline ${activeSection === "membership" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "membership")}><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" fill="currentColor"/></svg><span>Membership</span></a>
-            <a href="#contact" className={`flex items-center gap-2 hover:underline ${activeSection === "contact" ? "underline" : ""}`} onClick={(e) => handleNavClick(e, "contact")}>
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-13zM4.5 5A.5.5 0 0 0 4 5.5V6l8 4.5L20 6v-.5a.5.5 0 0 0-.5-.5h-15z" fill="currentColor"/></svg>
-              <span>Contact</span>
-            </a>
-            <a href="/members" className={`flex items-center gap-2 hover:underline ${activeSection === "members" ? "underline" : ""}`}>
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" fill="currentColor"/></svg>
-              <span>Members</span>
-            </a>
-          </nav>
-        )}
-      </header>
+      <Navigation 
+        menuOpen={menuOpen}
+        activeSection={activeSection}
+        onMenuToggle={() => setMenuOpen(!menuOpen)}
+        onNavClick={handleNavClick}
+      />
 
       {/* Full-width Header Banner */}
       <section
@@ -290,9 +40,9 @@ export default function Home() {
 
       {/* About Us Section */}
       {(activeSection === "home" || activeSection === "about") && (
-        <section id="about" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
+        <section id="about" className="section-container">
           <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold mb-4">About Us</h2>
+            <h2 className="section-title">About Us</h2>
             <p className="mb-4 text-gray-700">
               Cromwell Fish & Game Club is a community-run organization dedicated to promoting responsible outdoor recreation,
               conservation, and education. Our members enjoy regular meetings, youth events, and habitat stewardship projects.
@@ -306,24 +56,18 @@ export default function Home() {
 
       {/* Conditionally rendered content sections */}
       {(activeSection === "home" || activeSection === "events") && (
-        <section id="events" className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Upcoming Events</h2>
+        <section id="events" className="section-container">
+          <h2 className="section-title">Upcoming Events</h2>
           {/* Event cards */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-700">Showing {eventsComputed.shown.length} event{eventsComputed.shown.length !== 1 ? 's' : ''}</p>
-            <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">{showPast ? 'Hide past events' : 'Show past events'}</button>
+            <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">
+              {showPast ? 'Hide past events' : 'Show past events'}
+            </button>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2">
-            {eventsComputed.shown.map((ev: any) => (
-              <article key={ev.id} className="bg-white rounded shadow p-4 border-l-4 border-green-800">
-                <h3 className="text-lg font-semibold text-green-900">{ev.title}</h3>
-                <p className="text-sm text-green-700 mb-2">{formatLocal(new Date(ev.start))} • {Math.round(ev.durationMinutes/60)} hr{ev.durationMinutes>60? 's' : ''}</p>
-                <p className="text-sm mb-3 text-gray-700">{ev.description}</p>
-                <div className="flex gap-3">
-                  <a href={getGoogleUrl(ev)} target="_blank" rel="noopener noreferrer" className="inline-block bg-green-800 text-white px-3 py-2 rounded hover:bg-green-700">Add to Google Calendar</a>
-                  <button onClick={() => downloadICS(ev)} className="inline-block bg-green-600 text-white px-3 py-2 rounded hover:bg-green-500">Download .ics</button>
-                </div>
-              </article>
+          <div className="grid-responsive">
+            {eventsComputed.shown.map((event) => (
+              <EventCard key={event.id} event={event} />
             ))}
           </div>
         </section>
@@ -341,69 +85,18 @@ export default function Home() {
               Please join the wait list below and we'll notify you by email when a place opens up.
             </p>
 
-            <form className="grid gap-3 sm:grid-cols-1 mb-4" onSubmit={async (e) => {
-              e.preventDefault();
-              setWaitSuccess('');
-              // simple address validation: require at least 5 characters if provided and contain a number (street number)
-              if (waitAddress) {
-                const addrTrim = waitAddress.trim();
-                if (addrTrim.length < 5 || !/\d/.test(addrTrim)) {
-                  setWaitSuccess('Please enter a valid address (include street number).');
-                  return;
-                }
-              }
+            <WaitlistForm />
 
-              // require town and state
-              if (!waitTown.trim() || !waitState.trim()) {
-                setWaitSuccess('Please provide your town and state.');
-                return;
-              }
-
-              try {
-                const res = await fetch('/api/waitlist', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ name: waitName, email: waitEmail, phone: waitPhone, address: waitAddress, town: waitTown, state: waitState, message: waitMessage }),
-                });
-                const json = await res.json();
-                if (!res.ok) throw new Error(json?.error || 'Submission failed');
-                if (json.fallback) {
-                  setWaitSuccess(`Thanks — added to wait list (stored temporarily).`);
-                } else if (json.persistedTo) {
-                  setWaitSuccess('Thanks — you have been added to the wait list.');
-                } else {
-                  setWaitSuccess('Thanks — you have been added to the wait list.');
-                }
-                // clear the form
-                setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitTown(''); setWaitState(''); setWaitMessage('');
-              } catch (err: any) {
-                setWaitSuccess(`Error: ${err?.message || 'Could not submit'}`);
-              }
-            }}>
-              <input className="w-full px-3 py-2 rounded border" placeholder="Full name" value={waitName} onChange={(e) => setWaitName(e.target.value)} required />
-              <input className="w-full px-3 py-2 rounded border" placeholder="Email address" type="email" value={waitEmail} onChange={(e) => setWaitEmail(e.target.value)} required />
-              <input className="w-full px-3 py-2 rounded border" placeholder="Phone number" type="tel" value={waitPhone} onChange={(e) => setWaitPhone(e.target.value)} />
-              <input className="w-full px-3 py-2 rounded border" placeholder="Address (optional, include street number)" value={waitAddress} onChange={(e) => setWaitAddress(e.target.value)} />
-              <div className="grid sm:grid-cols-2 gap-3">
-                <input className="w-full px-3 py-2 rounded border" placeholder="Town" value={waitTown} onChange={(e) => setWaitTown(e.target.value)} required />
-                <input className="w-full px-3 py-2 rounded border" placeholder="State" value={waitState} onChange={(e) => setWaitState(e.target.value)} required />
-              </div>
-              <textarea className="w-full px-3 py-2 rounded border" placeholder="Optional message (interests/notes)" value={waitMessage} onChange={(e) => setWaitMessage(e.target.value)} rows={3} />
-              <div className="flex items-center justify-center gap-3">
-                <button type="submit" className="bg-green-800 text-white px-6 py-3 rounded hover:bg-green-700 transition">Join the Wait List</button>
-                <button type="button" onClick={() => { setWaitName(''); setWaitEmail(''); setWaitPhone(''); setWaitAddress(''); setWaitTown(''); setWaitState(''); setWaitMessage(''); setWaitSuccess(''); }} className="text-sm text-gray-700 underline">Clear</button>
-              </div>
-            </form>
-
-            {waitSuccess && <p className="text-sm text-green-800">{waitSuccess}</p>}
-            <p className="mt-6 text-sm text-gray-600">Questions? Use the contact form above or visit the <a href="/contact" className="underline text-green-900">Contact page</a>.</p>
+            <p className="mt-6 text-sm text-gray-600">
+              Questions? Use the contact form above or visit the <a href="/contact" className="underline text-green-900">Contact page</a>.
+            </p>
           </div>
         </section>
       )}
 
       {(activeSection === "home" || activeSection === "contact") && (
-        <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Contact Us</h2>
+        <section id="contact" className="section-container text-center">
+          <h2 className="section-title">Contact Us</h2>
           <p className="mb-6">Send us a message and we'll get back to you as soon as we can.</p>
 
           {/* Contact form */}
