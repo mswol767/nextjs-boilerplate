@@ -6,6 +6,7 @@ import type { Event, EventComputed } from "../types";
 export function useEvents() {
   const [eventsData, setEventsData] = useState<Event[] | null>(null);
   const [showPast, setShowPast] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Load events from API, fallback to public/events.json, then defaults
   useEffect(() => {
@@ -47,7 +48,12 @@ export function useEvents() {
     
     load();
     return () => { cancelled = true };
-  }, []);
+  }, [refreshTrigger]);
+
+  // Function to refresh events data
+  const refreshEvents = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   const eventsComputed = useMemo((): EventComputed => {
     const now = new Date();
@@ -90,6 +96,7 @@ export function useEvents() {
   return {
     eventsComputed,
     showPast,
-    setShowPast
+    setShowPast,
+    refreshEvents
   };
 }

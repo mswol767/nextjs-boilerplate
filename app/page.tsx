@@ -6,11 +6,18 @@ import WaitlistForm from "../components/WaitlistForm";
 import EventCard from "../components/EventCard";
 import { useNavigation } from "../hooks/useNavigation";
 import { useEvents } from "../hooks/useEvents";
+import { useEffect } from "react";
 
 export default function Home() {
   const { menuOpen, activeSection, setMenuOpen, setActiveSection, handleNavClick } = useNavigation();
-  const { eventsComputed, showPast, setShowPast } = useEvents();
+  const { eventsComputed, showPast, setShowPast, refreshEvents } = useEvents();
 
+  // Refresh events when events section becomes active
+  useEffect(() => {
+    if (activeSection === "events") {
+      refreshEvents();
+    }
+  }, [activeSection, refreshEvents]);
 
   return (
     <div className="font-sans min-h-screen bg-green-50 text-gray-900 flex flex-col">
@@ -64,9 +71,14 @@ export default function Home() {
           {/* Event cards */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-700">Showing {eventsComputed.shown.length} event{eventsComputed.shown.length !== 1 ? 's' : ''}</p>
-            <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">
-              {showPast ? 'Hide past events' : 'Show past events'}
-            </button>
+            <div className="flex items-center gap-4">
+              <button onClick={refreshEvents} className="text-sm text-green-800 underline">
+                Refresh Events
+              </button>
+              <button onClick={() => setShowPast(!showPast)} className="text-sm text-green-800 underline">
+                {showPast ? 'Hide past events' : 'Show past events'}
+              </button>
+            </div>
           </div>
           <div className="grid-responsive">
             {eventsComputed.shown.map((event) => (
