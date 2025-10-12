@@ -84,9 +84,6 @@ export default function Home() {
               Our membership is currently at capacity. We appreciate your interest — we maintain a wait list and will contact
               interested individuals as spots become available.
             </p>
-            <p className="mb-6 text-gray-700">
-              Please join the wait list below and we'll notify you by email when a place opens up.
-            </p>
 
             <WaitlistForm />
 
