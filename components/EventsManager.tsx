@@ -25,19 +25,15 @@ export default function EventsManager() {
   const loadEvents = async () => {
     try {
       setLoading(true);
-      console.log('Loading events...');
       const response = await fetch('/api/events');
       const result = await response.json();
-      console.log('Load events response:', result);
       
       if (!result.ok) {
         throw new Error(result.error || 'Failed to load events');
       }
       
       setEvents(result.data || []);
-      console.log('Events loaded:', result.data);
     } catch (err: any) {
-      console.error('Error loading events:', err);
       setError(err.message || 'Failed to load events');
     } finally {
       setLoading(false);
@@ -97,8 +93,6 @@ export default function EventsManager() {
         ? { id: editingEvent.id, ...formData }
         : formData;
 
-      console.log('Submitting event:', { method, url, body });
-
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -106,7 +100,6 @@ export default function EventsManager() {
       });
 
       const result = await response.json();
-      console.log('API response:', result);
 
       if (!result.ok) {
         throw new Error(result.error || 'Failed to save event');
@@ -115,7 +108,6 @@ export default function EventsManager() {
       await loadEvents();
       resetForm();
     } catch (err: any) {
-      console.error('Error saving event:', err);
       setError(err.message || 'Failed to save event');
     }
   };
@@ -126,13 +118,11 @@ export default function EventsManager() {
     }
 
     try {
-      console.log('Deleting event:', eventId);
       const response = await fetch(`/api/events?id=${eventId}`, {
         method: 'DELETE'
       });
 
       const result = await response.json();
-      console.log('Delete response:', result);
 
       if (!result.ok) {
         throw new Error(result.error || 'Failed to delete event');

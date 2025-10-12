@@ -9,7 +9,8 @@ export function getEventsConfig(): EventsConfig {
   const isVercel = process.env.VERCEL === '1';
   const isAWS = process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
   const isProduction = process.env.NODE_ENV === 'production';
-  const isServerless = isVercel || isAWS || isProduction;
+  // Only use serverless mode for actual serverless platforms, not just production
+  const isServerless = isVercel || isAWS;
 
   return {
     useFileSystem: !isServerless,
