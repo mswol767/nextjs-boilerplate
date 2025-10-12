@@ -37,7 +37,7 @@ export default function Home() {
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-white/90 mb-6">
             Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.
           </p>
-          {/* CTA removed per request */}
+          {/* CTA removed per request - updated styling */}
         </div>
       </section>
 
