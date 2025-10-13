@@ -70,6 +70,8 @@ export default function GuestCardGenerator() {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
+        width: 525,
+        height: 300,
       });
       
       const link = document.createElement('a');
@@ -93,6 +95,8 @@ export default function GuestCardGenerator() {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
+        width: 525,
+        height: 300,
       });
       
       canvas.toBlob(async (blob) => {
@@ -284,64 +288,64 @@ END:VCARD`;
         ) : (
           <div className="space-y-6">
             {/* Guest Card Preview */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 lg:p-8">
               <div className="flex justify-center">
-                <div ref={cardRef} style={{ width: '525px', height: '300px' }}>
+                <div ref={cardRef} className="w-full max-w-[525px]" style={{ aspectRatio: '1.75/1' }}>
                   {/* Card Design - Business card size (3.5" x 2" at 150 DPI) */}
                   <div className="relative h-full bg-gradient-to-br from-green-50 to-white rounded-lg shadow-2xl overflow-hidden border-2 border-green-600">
                     {/* Decorative corner accents */}
                     <div className="absolute top-0 right-0 w-20 h-20 bg-green-600 opacity-10 rounded-bl-full"></div>
                     <div className="absolute bottom-0 left-0 w-20 h-20 bg-green-600 opacity-10 rounded-tr-full"></div>
                     
-                    <div className="relative h-full p-4 flex flex-col">
+                    <div className="relative h-full p-3 sm:p-4 flex flex-col">
                       {/* Header with gradient background */}
-                      <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-md px-3 py-2 mb-2.5 shadow-md">
-                        <h1 className="text-base font-bold text-white text-center tracking-wide leading-tight">
+                      <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-md px-3 py-2 sm:py-2 mb-2 sm:mb-2.5 shadow-md">
+                        <h1 className="text-sm sm:text-base font-bold text-white text-center tracking-wide leading-tight">
                           CROMWELL FISH & GAME CLUB
                         </h1>
                         <div className="flex items-center justify-center gap-1.5 mt-0.5">
-                          <div className="h-px w-6 bg-white opacity-50"></div>
+                          <div className="h-px w-4 sm:w-6 bg-white opacity-50"></div>
                           <p className="text-xs font-semibold text-white uppercase tracking-wider">Guest Pass</p>
-                          <div className="h-px w-6 bg-white opacity-50"></div>
+                          <div className="h-px w-4 sm:w-6 bg-white opacity-50"></div>
                         </div>
                       </div>
 
                       {/* Guest Information - Compact layout */}
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-1.5 sm:space-y-2">
                         {/* Primary Info - Guest & Phone */}
-                        <div className="bg-white rounded-md p-2 shadow-sm border border-green-100">
+                        <div className="bg-white rounded-md p-2 sm:p-2 shadow-sm border border-green-100">
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Guest</p>
-                              <p className="text-sm font-bold text-gray-900 leading-tight">{formData.guestName}</p>
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Guest</p>
+                              <p className="text-xs sm:text-sm font-bold text-gray-900 leading-tight break-words">{formData.guestName}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Phone</p>
-                              <p className="text-sm font-semibold text-gray-900 leading-tight">{formData.phoneNumber}</p>
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Phone</p>
+                              <p className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight">{formData.phoneNumber}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* All Hunt Details in one card */}
-                        <div className="bg-white rounded-md p-2 shadow-sm border border-green-100">
+                        <div className="bg-white rounded-md p-2 sm:p-2 shadow-sm border border-green-100">
                           <div className="grid grid-cols-2 gap-2 mb-1.5">
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Sponsor</p>
-                              <p className="text-sm font-bold text-gray-900 leading-tight">{formData.memberName}</p>
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Sponsor</p>
+                              <p className="text-xs sm:text-sm font-bold text-gray-900 leading-tight break-words">{formData.memberName}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Cost</p>
-                              <p className="text-base font-bold text-green-600 leading-tight">{getHuntCost(formData.huntType)}</p>
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Cost</p>
+                              <p className="text-sm sm:text-base font-bold text-green-600 leading-tight">{getHuntCost(formData.huntType)}</p>
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-gray-100">
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Hunt Type</p>
-                              <p className="text-xs font-bold text-gray-900 leading-tight">{formData.huntType}</p>
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Hunt Type</p>
+                              <p className="text-xs sm:text-xs font-bold text-gray-900 leading-tight break-words">{formData.huntType}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Hunt Date</p>
-                              <p className="text-xs font-semibold text-gray-900 leading-tight">
+                              <p className="text-xs sm:text-xs font-semibold text-green-700 uppercase tracking-wide mb-0.5">Hunt Date</p>
+                              <p className="text-xs sm:text-xs font-semibold text-gray-900 leading-tight">
                                 {new Date(formData.huntDate).toLocaleDateString('en-US', { 
                                   month: 'short', 
                                   day: 'numeric',
@@ -354,8 +358,8 @@ END:VCARD`;
                       </div>
 
                       {/* Footer - Compact Terms */}
-                      <div className="bg-green-50 rounded-md px-2 py-1.5 mt-2 border border-green-200">
-                        <p className="text-xs text-gray-700 text-center leading-snug">
+                      <div className="bg-green-50 rounded-md px-2 py-1.5 sm:mt-2 mt-1.5 border border-green-200">
+                        <p className="text-xs sm:text-xs text-gray-700 text-center leading-snug">
                           Permission to hunt and fish on club property • Valid one day only
                         </p>
                       </div>
