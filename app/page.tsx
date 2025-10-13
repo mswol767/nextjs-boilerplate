@@ -64,7 +64,10 @@ export default function Home() {
               <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="7" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="4" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="1" strokeWidth="2"/>
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Shooting Range</h3>
