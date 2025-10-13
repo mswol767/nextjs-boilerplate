@@ -20,6 +20,18 @@ let events: Event[] = [
     title: 'Annual Club Banquet',
     description: 'Our annual celebration with awards, dinner, and entertainment for all members.',
     start: new Date('2025-02-25T17:00:00')
+  },
+  {
+    id: 'spring-cleanup',
+    title: 'Spring Property Cleanup',
+    description: 'Help us clean up the club property and prepare for the spring season.',
+    start: new Date('2025-03-15T09:00:00')
+  },
+  {
+    id: 'youth-fishing',
+    title: 'Youth Fishing Day',
+    description: 'A special day for young anglers to learn fishing skills and enjoy the outdoors.',
+    start: new Date('2025-03-22T10:00:00')
   }
 ];
 
