@@ -59,11 +59,16 @@ export default function EventsManager() {
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
     
+    console.log('Editing event:', event);
+    console.log('Event start (stored):', event.start);
+    
     // Convert UTC date back to Eastern Time for the form
     const eventDate = new Date(event.start);
+    console.log('Event date object:', eventDate);
     
     // Convert UTC to Eastern Time
     const easternDate = new Date(eventDate.toLocaleString("en-US", {timeZone: "America/New_York"}));
+    console.log('Eastern date:', easternDate);
     
     const year = easternDate.getFullYear();
     const month = String(easternDate.getMonth() + 1).padStart(2, '0');
@@ -71,6 +76,8 @@ export default function EventsManager() {
     const hours = String(easternDate.getHours()).padStart(2, '0');
     const minutes = String(easternDate.getMinutes()).padStart(2, '0');
     const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    
+    console.log('Form datetime string:', localDateTime);
     
     setFormData({
       title: event.title,
@@ -95,13 +102,18 @@ export default function EventsManager() {
       // The datetime-local input gives us a string like "2025-01-15T18:00"
       // We need to treat this as Eastern Time and convert it to UTC for storage
       
+      console.log('Form input:', formData.start);
+      
       // Parse the datetime-local string
       const [datePart, timePart] = formData.start.split('T');
       const [year, month, day] = datePart.split('-').map(Number);
       const [hours, minutes] = timePart.split(':').map(Number);
       
+      console.log('Parsed:', { year, month, day, hours, minutes });
+      
       // Create a date object in local timezone first
       const localDate = new Date(year, month - 1, day, hours, minutes);
+      console.log('Local date created:', localDate);
       
       // Convert to Eastern Time by using the timezone offset
       // We'll use a simple approach: treat the input as if it were in Eastern Time
@@ -111,6 +123,9 @@ export default function EventsManager() {
       // This can be improved later to handle EDT automatically
       const estOffsetMs = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
       const utcDateTime = new Date(localDate.getTime() + estOffsetMs);
+      
+      console.log('UTC date created:', utcDateTime);
+      console.log('UTC ISO string:', utcDateTime.toISOString());
       
       const url = editingEvent ? '/api/events' : '/api/events';
       const method = editingEvent ? 'PUT' : 'POST';
