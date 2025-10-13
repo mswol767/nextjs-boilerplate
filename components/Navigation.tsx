@@ -101,7 +101,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         ? 'bg-green-900/95 backdrop-blur-sm shadow-lg' 
         : 'bg-green-800'
       }
-      ${menuOpen ? 'h-auto' : 'h-16 sm:h-20'}
+      ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}
     `}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
         {/* Logo/Brand */}
