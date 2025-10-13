@@ -8,7 +8,7 @@ interface LoginRequest {
 export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
   try {
     const { password }: LoginRequest = await req.json();
-    const expected = process.env.ADMIN_PASS || '';
+    const expected = process.env.ADMIN_PASS || 'CFG2025';
     
     if (!expected) {
       return NextResponse.json({ 

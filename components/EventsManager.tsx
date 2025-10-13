@@ -130,7 +130,6 @@ export default function EventsManager() {
 
       await loadEvents();
     } catch (err: any) {
-      console.error('Error deleting event:', err);
       setError(err.message || 'Failed to delete event');
     }
   };
