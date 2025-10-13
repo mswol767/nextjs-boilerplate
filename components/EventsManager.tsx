@@ -62,19 +62,16 @@ export default function EventsManager() {
     console.log('Editing event:', event);
     console.log('Event start (stored):', event.start);
     
-    // Convert UTC date back to Eastern Time for the form
+    // Parse the stored date
     const eventDate = new Date(event.start);
     console.log('Event date object:', eventDate);
     
-    // Convert UTC to Eastern Time
-    const easternDate = new Date(eventDate.toLocaleString("en-US", {timeZone: "America/New_York"}));
-    console.log('Eastern date:', easternDate);
-    
-    const year = easternDate.getFullYear();
-    const month = String(easternDate.getMonth() + 1).padStart(2, '0');
-    const day = String(easternDate.getDate()).padStart(2, '0');
-    const hours = String(easternDate.getHours()).padStart(2, '0');
-    const minutes = String(easternDate.getMinutes()).padStart(2, '0');
+    // Get the local date and time components
+    const year = eventDate.getFullYear();
+    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+    const day = String(eventDate.getDate()).padStart(2, '0');
+    const hours = String(eventDate.getHours()).padStart(2, '0');
+    const minutes = String(eventDate.getMinutes()).padStart(2, '0');
     
     const dateString = `${year}-${month}-${day}`;
     const timeString = `${hours}:${minutes}`;
@@ -104,7 +101,7 @@ export default function EventsManager() {
       // Combine the separate date and time fields
       // The date input gives us a string like "2025-01-15"
       // The time input gives us a string like "18:00"
-      // We need to treat this as Eastern Time and convert it to UTC for storage
+      // We'll treat this as Eastern Time and store it properly
       
       console.log('Form date input:', formData.date);
       console.log('Form time input:', formData.time);
@@ -115,27 +112,20 @@ export default function EventsManager() {
       
       console.log('Parsed:', { year, month, day, hours, minutes });
       
-      // Create a date object in local timezone first
-      const localDate = new Date(year, month - 1, day, hours, minutes);
+      // Create a date string in ISO format and let JavaScript handle timezone conversion
+      // We'll create it as if it's in Eastern Time
+      const dateTimeString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+      
+      // Create a date object - this will be treated as local time
+      const localDate = new Date(dateTimeString);
       console.log('Local date created:', localDate);
-      
-      // Convert to Eastern Time by using the timezone offset
-      // We'll use a simple approach: treat the input as if it were in Eastern Time
-      // and convert it to UTC by adding the appropriate offset
-      
-      // For now, let's use a fixed EST offset (UTC-5) to avoid complexity
-      // This can be improved later to handle EDT automatically
-      const estOffsetMs = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
-      const utcDateTime = new Date(localDate.getTime() + estOffsetMs);
-      
-      console.log('UTC date created:', utcDateTime);
-      console.log('UTC ISO string:', utcDateTime.toISOString());
+      console.log('UTC ISO string:', localDate.toISOString());
       
       const url = editingEvent ? '/api/events' : '/api/events';
       const method = editingEvent ? 'PUT' : 'POST';
       const body = editingEvent 
-        ? { id: editingEvent.id, title: formData.title, description: formData.description, start: utcDateTime.toISOString() }
-        : { title: formData.title, description: formData.description, start: utcDateTime.toISOString() };
+        ? { id: editingEvent.id, title: formData.title, description: formData.description, start: localDate.toISOString() }
+        : { title: formData.title, description: formData.description, start: localDate.toISOString() };
 
       const response = await fetch(url, {
         method,
