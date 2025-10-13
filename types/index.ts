@@ -29,7 +29,6 @@ export interface WaitlistFormData {
   address: string;
   town: string;
   state: string;
-  message: string;
 }
 
 // Waitlist types
