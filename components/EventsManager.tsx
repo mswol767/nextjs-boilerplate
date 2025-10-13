@@ -95,19 +95,22 @@ export default function EventsManager() {
       // The datetime-local input gives us a string like "2025-01-15T18:00"
       // We need to treat this as Eastern Time and convert it to UTC for storage
       
-      // Parse the datetime-local string and treat it as Eastern Time
+      // Parse the datetime-local string
       const [datePart, timePart] = formData.start.split('T');
       const [year, month, day] = datePart.split('-').map(Number);
       const [hours, minutes] = timePart.split(':').map(Number);
       
-      // Create a date string in Eastern Time format
-      const easternTimeString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+      // Create a date object in local timezone first
+      const localDate = new Date(year, month - 1, day, hours, minutes);
       
-      // Create a date object and treat it as Eastern Time
-      // We'll use a simple approach: assume EST (UTC-5) for now
+      // Convert to Eastern Time by using the timezone offset
+      // We'll use a simple approach: treat the input as if it were in Eastern Time
+      // and convert it to UTC by adding the appropriate offset
+      
+      // For now, let's use a fixed EST offset (UTC-5) to avoid complexity
       // This can be improved later to handle EDT automatically
-      const easternDateTime = new Date(easternTimeString);
-      const utcDateTime = new Date(easternDateTime.getTime() + (5 * 60 * 60 * 1000)); // Add 5 hours to convert EST to UTC
+      const estOffsetMs = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+      const utcDateTime = new Date(localDate.getTime() + estOffsetMs);
       
       const url = editingEvent ? '/api/events' : '/api/events';
       const method = editingEvent ? 'PUT' : 'POST';
