@@ -11,7 +11,11 @@ export default function EventCard({ event }: EventCardProps) {
   const eventStart = new Date(event.start);
   
   const formatLocal = (d: Date) => {
-    return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    return d.toLocaleString('en-US', { 
+      dateStyle: 'medium', 
+      timeStyle: 'short',
+      timeZone: 'America/New_York' // Eastern Time
+    });
   };
 
   const pad = (n: number) => n.toString().padStart(2, '0');
