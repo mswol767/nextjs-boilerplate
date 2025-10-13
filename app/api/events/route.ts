@@ -84,7 +84,7 @@ async function writeEvents(events: Event[]): Promise<void> {
       await fs.writeFile(publicEventsFile, JSON.stringify(eventsForStorage, null, 2), 'utf8');
     } catch (error) {
       // This might fail on Vercel, but that's okay - in-memory will work
-      console.log('Could not write to public folder (expected on Vercel):', error.message);
+      console.log('Could not write to public folder (expected on Vercel):', error instanceof Error ? error.message : String(error));
     }
     return;
   }
