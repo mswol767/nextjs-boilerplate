@@ -96,7 +96,9 @@ export default function Home() {
               <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <rect x="2" y="10" width="16" height="4" strokeWidth={2} rx="1"/>
+                    <rect x="18" y="9" width="4" height="6" strokeWidth={2} rx="1"/>
+                    <circle cx="20" cy="12" r="1.5" fill="currentColor"/>
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Skeet House</h3>
