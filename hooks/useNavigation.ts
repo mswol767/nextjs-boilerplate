@@ -54,7 +54,11 @@ export function useNavigation() {
       const obs = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && !manualNavRef.current) {
+            // Only update activeSection if:
+            // 1. Not in manual navigation mode
+            // 2. The section is actually intersecting (visible)
+            // 3. We're not currently viewing a specific section (only update when activeSection is "home")
+            if (entry.isIntersecting && !manualNavRef.current && activeSection === "home") {
               setActiveSection(id);
             }
           });
@@ -67,7 +71,7 @@ export function useNavigation() {
     });
     
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [activeSection]);
 
   return {
     menuOpen,

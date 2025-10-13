@@ -75,17 +75,9 @@ export default function EventCard({ event }: EventCardProps) {
       </p>
       <p className="text-sm mb-3 text-gray-700">{event.description}</p>
       <div className="flex gap-3">
-        <a 
-          href="https://calendar.google.com/calendar/embed?src=cromwellfgc@gmail.com&ctz=America/New_York" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="btn-primary"
-        >
-          View Full Calendar
-        </a>
         <button 
           onClick={() => downloadICS(event)} 
-          className="btn-secondary"
+          className="btn-primary"
         >
           Download .ics
         </button>

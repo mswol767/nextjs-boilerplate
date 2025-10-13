@@ -182,7 +182,7 @@ export default function ContactForm() {
           </svg>
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Contact Us</h3>
-        <p className="text-gray-600">Send us a message and we'll get back to you</p>
+        <p className="text-gray-600">Send us a message and we'll get back to you as soon as we can</p>
       </div>
 
       {/* Form */}
