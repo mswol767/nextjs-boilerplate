@@ -24,6 +24,23 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showMembersLogin) {
+        const target = event.target as Element;
+        if (!target.closest('[data-members-dropdown]')) {
+          setShowMembersLogin(false);
+        }
+      }
+    };
+
+    if (showMembersLogin) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showMembersLogin]);
+
   // Handle members click to show login in header
   const handleMembersClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -108,7 +125,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
 
   return (
     <header className={`
-      fixed top-0 left-0 right-0 z-50 w-full text-white transition-all duration-300
+      fixed top-0 left-0 right-0 z-50 w-full text-white transition-all duration-300 relative
       ${isScrolled 
         ? 'bg-green-900/95 backdrop-blur-sm shadow-lg' 
         : 'bg-green-800'
@@ -157,6 +174,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
             href="#members" 
             onClick={handleMembersClick}
             title="Members only — staff and members" 
+            data-members-dropdown
             className={`
               group flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200
               ${showMembersLogin 
@@ -194,6 +212,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
             <a 
               href="#members" 
               onClick={handleMembersClick}
+              data-members-dropdown
               className={`
                 group flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 w-full
                 ${showMembersLogin 
@@ -217,35 +236,30 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         </div>
       )}
 
-      {/* Members Login Form in Header */}
+      {/* Members Login Dropdown */}
       {showMembersLogin && (
-        <div className="border-t border-green-700/50 bg-green-700/50">
-          <div className="max-w-7xl mx-auto p-4 sm:p-6">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Members Area</h3>
-                    <p className="text-sm text-gray-600">Sign in to access member resources</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowMembersLogin(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label="Close"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <div className="absolute top-full right-4 sm:right-6 mt-2 z-50" data-members-dropdown>
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-80 max-w-[calc(100vw-2rem)]">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" />
                   </svg>
-                </button>
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900">Members Login</h3>
               </div>
-              <Login onSuccess={() => setShowMembersLogin(false)} />
+              <button
+                onClick={() => setShowMembersLogin(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
+            <Login onSuccess={() => setShowMembersLogin(false)} />
           </div>
         </div>
       )}
