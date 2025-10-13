@@ -59,13 +59,17 @@ export default function EventsManager() {
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
     
-    // Convert date to local datetime-local format
+    // Convert UTC date back to Eastern Time for the form
     const eventDate = new Date(event.start);
-    const year = eventDate.getFullYear();
-    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-    const day = String(eventDate.getDate()).padStart(2, '0');
-    const hours = String(eventDate.getHours()).padStart(2, '0');
-    const minutes = String(eventDate.getMinutes()).padStart(2, '0');
+    
+    // Convert UTC to Eastern Time
+    const easternDate = new Date(eventDate.toLocaleString("en-US", {timeZone: "America/New_York"}));
+    
+    const year = easternDate.getFullYear();
+    const month = String(easternDate.getMonth() + 1).padStart(2, '0');
+    const day = String(easternDate.getDate()).padStart(2, '0');
+    const hours = String(easternDate.getHours()).padStart(2, '0');
+    const minutes = String(easternDate.getMinutes()).padStart(2, '0');
     const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
     
     setFormData({
