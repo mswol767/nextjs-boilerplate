@@ -47,7 +47,7 @@ export default function Home() {
 
       {/* About Us Section */}
       {(activeSection === "home" || activeSection === "about") && (
-        <section id="about" className="section-container">
+        <section id="about" className="w-full mx-auto px-4 sm:px-8 py-12">
           <div className="text-center">
             <h2 className="section-title">About Us</h2>
             <p className="mb-8 text-gray-700 max-w-3xl mx-auto">
@@ -116,7 +116,7 @@ export default function Home() {
 
       {/* Conditionally rendered content sections */}
       {(activeSection === "home" || activeSection === "events") && (
-        <section id="events" className="section-container">
+        <section id="events" className="w-full mx-auto px-4 sm:px-8 py-12">
           <h2 className="section-title">Upcoming Events</h2>
           {/* Event cards */}
           <div className="flex items-center justify-between mb-4">
@@ -139,26 +139,30 @@ export default function Home() {
       )}
 
       {(activeSection === "home" || activeSection === "membership") && (
-        <section id="membership" className="section-container">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Membership (Currently Full)</h2>
-            <p className="mb-4 text-gray-700">
-              Our membership is currently at capacity. We appreciate your interest — we maintain a wait list and will contact
-              interested individuals as spots become available.
-            </p>
+        <section id="membership" className="w-full mx-auto px-0 py-12">
+          <div className="w-full mx-auto text-center">
+            <div className="max-w-3xl mx-auto px-4 sm:px-8 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Membership (Currently Full)</h2>
+              <p className="mb-4 text-gray-700">
+                Our membership is currently at capacity. We appreciate your interest — we maintain a wait list and will contact
+                interested individuals as spots become available.
+              </p>
+            </div>
 
             <WaitlistForm />
 
-            <p className="mt-6 text-sm text-gray-600">
-              Questions? Use the contact form above or visit the <a href="/contact" className="underline text-green-900">Contact page</a>.
-            </p>
+            <div className="max-w-3xl mx-auto px-4 sm:px-8 mt-6">
+              <p className="text-sm text-gray-600">
+                Questions? Use the contact form above or visit the <a href="/contact" className="underline text-green-900">Contact page</a>.
+              </p>
+            </div>
           </div>
         </section>
       )}
 
 
       {(activeSection === "home" || activeSection === "contact") && (
-        <section id="contact" className="section-container text-center">
+        <section id="contact" className="w-full mx-auto px-0 py-12 text-center">
           {/* Contact form */}
           <ContactForm />
         </section>

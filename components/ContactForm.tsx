@@ -173,8 +173,8 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
-      {/* Header */}
+    <div className="w-full mx-auto px-4 sm:px-8 lg:px-16 xl:px-24">
+      {/* Contact Form Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
           <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
