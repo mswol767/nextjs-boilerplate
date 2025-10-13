@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "event-1760316018449-n42zl9",
+    "title": "test",
+    "description": "test",
+    "start": "2025-10-13T22:40:00.000Z",
+    "durationMinutes": 60
+  },
+  {
+    "id": "event-1760321366645-h3aywc",
+    "title": "Test Event",
+    "description": "Test Description",
+    "start": "2025-01-15T23:00:00.000Z",
+    "durationMinutes": 60
+  }
+]

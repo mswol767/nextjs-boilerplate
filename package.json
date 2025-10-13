@@ -10,6 +10,7 @@
     "import-pdfs": "node scripts/import-pdfs.js"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.10.0",
     "googleapis": "121.0.0",
     "next": "15.5.4",
     "nodemailer": "6.9.4",

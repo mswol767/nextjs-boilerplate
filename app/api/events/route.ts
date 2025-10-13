@@ -1,300 +1,190 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { sql } from '@vercel/postgres';
 import type { Event, ApiResponse } from '../../../types';
-import { getEventsConfig, DEFAULT_EVENTS } from './config';
 
-const EVENTS_FILE = path.join(process.cwd(), 'data', 'events.json');
-
-// In-memory store for production environments
-let inMemoryEvents: Event[] = [];
-let hasInitializedDefaults = false;
-
-// Initialize with default events for serverless environments
-function initializeDefaultEvents(): void {
-  if (!hasInitializedDefaults) {
-    inMemoryEvents = [...DEFAULT_EVENTS];
-    hasInitializedDefaults = true;
-  }
-}
-
-// Helper function to read events
-async function readEvents(): Promise<Event[]> {
-  const config = getEventsConfig();
-  
-  if (config.useInMemory) {
-    // In serverless (Vercel), use in-memory store
-    // If in-memory store is empty, try to load from public/events.json
-    if (inMemoryEvents.length === 0) {
-      try {
-        const publicEventsFile = path.join(process.cwd(), 'public', 'events.json');
-        const data = await fs.readFile(publicEventsFile, 'utf8');
-        const events = JSON.parse(data);
-        // Convert start dates back to Date objects and store in memory
-        inMemoryEvents = events.map((event: any) => ({
-          ...event,
-          start: new Date(event.start)
-        }));
-      } catch (error) {
-        // If public/events.json doesn't exist, use default events
-        inMemoryEvents = [...DEFAULT_EVENTS];
-        hasInitializedDefaults = true;
-      }
-    }
-    return inMemoryEvents;
-  }
-
-  if (config.useFileSystem) {
-    try {
-      const data = await fs.readFile(EVENTS_FILE, 'utf8');
-      const events = JSON.parse(data);
-      // Convert start dates back to Date objects
-      return events.map((event: any) => ({
-        ...event,
-        start: new Date(event.start)
-      }));
-    } catch (error) {
-      // If file doesn't exist, return empty array
-      return [];
-    }
-  }
-
-  // Fallback to in-memory store
-  return inMemoryEvents;
-}
-
-// Helper function to write events
-async function writeEvents(events: Event[]): Promise<void> {
-  const config = getEventsConfig();
-  
-  // Convert Date objects to ISO strings for storage
-  const eventsForStorage = events.map(event => ({
-    ...event,
-    start: event.start.toISOString()
-  }));
-  
-  if (config.useInMemory) {
-    // In serverless (Vercel), update in-memory store
-    inMemoryEvents = events;
-    hasInitializedDefaults = true;
-    
-    // Also try to write to public folder for persistence (if possible)
-    try {
-      const publicEventsFile = path.join(process.cwd(), 'public', 'events.json');
-      await fs.writeFile(publicEventsFile, JSON.stringify(eventsForStorage, null, 2), 'utf8');
-    } catch (error) {
-      // This might fail on Vercel, but that's okay - in-memory will work
-      console.log('Could not write to public folder (expected on Vercel):', error instanceof Error ? error.message : String(error));
-    }
-    return;
-  }
-
-  if (config.useFileSystem) {
-    try {
-      const dir = path.dirname(EVENTS_FILE);
-      await fs.mkdir(dir, { recursive: true });
-      await fs.writeFile(EVENTS_FILE, JSON.stringify(eventsForStorage, null, 2), 'utf8');
-    } catch (error) {
-      console.error('Failed to write to file system, falling back to in-memory store:', error);
-      // Fallback to in-memory store if file system write fails
-      inMemoryEvents = events;
-      hasInitializedDefaults = true;
-    }
-  } else {
-    // Fallback to in-memory store
-    inMemoryEvents = events;
-    hasInitializedDefaults = true;
-  }
-}
-
-// GET - Retrieve all events
-export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
+// Initialize the events table if it doesn't exist
+async function initializeTable() {
   try {
-    const events = await readEvents();
+    await sql`
+      CREATE TABLE IF NOT EXISTS events (
+        id VARCHAR(255) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        start TIMESTAMP WITH TIME ZONE NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+  } catch (error) {
+    console.error('Error creating events table:', error);
+  }
+}
+
+// GET /api/events
+export async function GET(): Promise<NextResponse<ApiResponse>> {
+  try {
+    await initializeTable();
+    
+    const result = await sql`
+      SELECT id, title, description, start, created_at, updated_at
+      FROM events
+      ORDER BY start ASC
+    `;
+    
+    const events: Event[] = result.rows.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description || '',
+      start: new Date(row.start)
+    }));
+    
     return NextResponse.json({ 
       ok: true, 
       data: events 
     });
-  } catch (error: any) {
-    console.error('Error reading events:', error);
+  } catch (error) {
+    console.error('Error fetching events:', error);
     return NextResponse.json({ 
       ok: false, 
-      error: error?.message || 'Failed to read events' 
+      error: 'Failed to fetch events' 
     }, { status: 500 });
   }
 }
 
-// POST - Create a new event
-export async function POST(req: Request): Promise<NextResponse<ApiResponse<Event>>> {
+// POST /api/events
+export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
   try {
-    const body = await req.json();
-    const { title, description, start, durationMinutes }: Partial<Event> = body;
-
-    // Validation
-    if (!title || !start || !durationMinutes) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Title, start date, and duration are required' 
-      }, { status: 400 });
-    }
-
-    // Additional validation
-    if (title.trim().length < 3) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Title must be at least 3 characters long' 
-      }, { status: 400 });
-    }
-
-    if (durationMinutes < 1 || durationMinutes > 1440) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Duration must be between 1 and 1440 minutes (24 hours)' 
-      }, { status: 400 });
-    }
-
-    const startDate = new Date(start);
-    if (isNaN(startDate.getTime())) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Invalid start date format' 
-      }, { status: 400 });
-    }
-
-    const events = await readEvents();
+    await initializeTable();
     
-    // Create new event
+    const body = await req.json();
+    const { title, description, start } = body;
+    
+    if (!title || !start) {
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Title and start date are required' 
+      }, { status: 400 });
+    }
+    
+    const id = `event-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const startDate = new Date(start);
+    
+    await sql`
+      INSERT INTO events (id, title, description, start)
+      VALUES (${id}, ${title}, ${description || ''}, ${startDate.toISOString()})
+    `;
+    
     const newEvent: Event = {
-      id: `event-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: title.trim(),
-      description: description?.trim() || '',
-      start: new Date(start),
-      durationMinutes: parseInt(durationMinutes.toString())
+      id,
+      title,
+      description: description || '',
+      start: startDate
     };
-
-    events.push(newEvent);
-    await writeEvents(events);
-
+    
     return NextResponse.json({ 
       ok: true, 
       data: newEvent 
-    });
-  } catch (error: any) {
+    }, { status: 201 });
+  } catch (error) {
     console.error('Error creating event:', error);
     return NextResponse.json({ 
       ok: false, 
-      error: error?.message || 'Failed to create event' 
+      error: 'Failed to create event' 
     }, { status: 500 });
   }
 }
 
-// PUT - Update an existing event
-export async function PUT(req: Request): Promise<NextResponse<ApiResponse<Event>>> {
+// PUT /api/events
+export async function PUT(req: Request): Promise<NextResponse<ApiResponse>> {
   try {
+    await initializeTable();
+    
     const body = await req.json();
-    const { id, title, description, start, durationMinutes }: Partial<Event> & { id: string } = body;
-
-    if (!id) {
+    const { id, title, description, start } = body;
+    
+    if (!id || !title || !start) {
       return NextResponse.json({ 
         ok: false, 
-        error: 'Event ID is required' 
+        error: 'ID, title, and start date are required' 
       }, { status: 400 });
     }
-
-    // Validation for update fields
-    if (title && title.trim().length < 3) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Title must be at least 3 characters long' 
-      }, { status: 400 });
-    }
-
-    if (durationMinutes && (durationMinutes < 1 || durationMinutes > 1440)) {
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Duration must be between 1 and 1440 minutes (24 hours)' 
-      }, { status: 400 });
-    }
-
-    if (start) {
-      const startDate = new Date(start);
-      if (isNaN(startDate.getTime())) {
-        return NextResponse.json({ 
-          ok: false, 
-          error: 'Invalid start date format' 
-        }, { status: 400 });
-      }
-    }
-
-    const events = await readEvents();
-    const eventIndex = events.findIndex(event => event.id === id);
-
-    if (eventIndex === -1) {
+    
+    const startDate = new Date(start);
+    
+    const result = await sql`
+      UPDATE events 
+      SET title = ${title}, 
+          description = ${description || ''}, 
+          start = ${startDate.toISOString()},
+          updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING id, title, description, start
+    `;
+    
+    if (result.rows.length === 0) {
       return NextResponse.json({ 
         ok: false, 
         error: 'Event not found' 
       }, { status: 404 });
     }
-
-    // Update event
+    
     const updatedEvent: Event = {
-      ...events[eventIndex],
-      title: title?.trim() || events[eventIndex].title,
-      description: description?.trim() || events[eventIndex].description,
-      start: start ? new Date(start) : events[eventIndex].start,
-      durationMinutes: durationMinutes ? parseInt(durationMinutes.toString()) : events[eventIndex].durationMinutes
+      id: result.rows[0].id,
+      title: result.rows[0].title,
+      description: result.rows[0].description || '',
+      start: new Date(result.rows[0].start)
     };
-
-    events[eventIndex] = updatedEvent;
-    await writeEvents(events);
-
+    
     return NextResponse.json({ 
       ok: true, 
       data: updatedEvent 
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error updating event:', error);
     return NextResponse.json({ 
       ok: false, 
-      error: error?.message || 'Failed to update event' 
+      error: 'Failed to update event' 
     }, { status: 500 });
   }
 }
 
-// DELETE - Delete an event
+// DELETE /api/events
 export async function DELETE(req: Request): Promise<NextResponse<ApiResponse>> {
   try {
+    await initializeTable();
+    
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-
+    
     if (!id) {
       return NextResponse.json({ 
         ok: false, 
         error: 'Event ID is required' 
       }, { status: 400 });
     }
-
-    const events = await readEvents();
-    const eventIndex = events.findIndex(event => event.id === id);
-
-    if (eventIndex === -1) {
+    
+    const result = await sql`
+      DELETE FROM events 
+      WHERE id = ${id}
+      RETURNING id
+    `;
+    
+    if (result.rows.length === 0) {
       return NextResponse.json({ 
         ok: false, 
         error: 'Event not found' 
       }, { status: 404 });
     }
-
-    events.splice(eventIndex, 1);
-    await writeEvents(events);
-
+    
     return NextResponse.json({ 
-      ok: true 
+      ok: true, 
+      message: 'Event deleted successfully' 
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error deleting event:', error);
     return NextResponse.json({ 
       ok: false, 
-      error: error?.message || 'Failed to delete event' 
+      error: 'Failed to delete event' 
     }, { status: 500 });
   }
 }
