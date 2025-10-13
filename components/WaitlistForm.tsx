@@ -40,8 +40,8 @@ export default function WaitlistForm() {
     
     if (address.length < 10) {
       error = 'Address too short (minimum 10 characters)';
-    } else if (!/^\d+\s|\s\d+\s/.test(address) && !/^\d+/.test(address)) {
-      error = 'Please include a street number';
+    } else if (!/^\d+/.test(address)) {
+      error = 'Please include a street number at the beginning';
     } else if (!/[a-zA-Z]/.test(address)) {
       error = 'Please include street name';
     } else {
@@ -86,9 +86,9 @@ export default function WaitlistForm() {
       return 'Please enter a complete address (at least 10 characters).';
     }
 
-    // Must contain a street number (digit at the beginning or after a space)
-    if (!/^\d+\s|\s\d+\s/.test(address) && !/^\d+/.test(address)) {
-      return 'Please include a street number in your address (e.g., "123 Main St").';
+    // Must contain a street number at the beginning
+    if (!/^\d+/.test(address)) {
+      return 'Please include a street number at the beginning of your address (e.g., "123 Main St").';
     }
 
     // Must contain at least one letter (street name)
