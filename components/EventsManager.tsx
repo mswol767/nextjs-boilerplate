@@ -14,8 +14,7 @@ export default function EventsManager() {
     title: '',
     description: '',
     date: '',
-    time: '',
-    durationMinutes: 60
+    time: ''
   });
 
   // Load events on component mount
@@ -51,8 +50,7 @@ export default function EventsManager() {
       title: '',
       description: '',
       date: '',
-      time: '',
-      durationMinutes: 60
+      time: ''
     });
     setEditingEvent(null);
     setShowForm(false);
@@ -88,8 +86,7 @@ export default function EventsManager() {
       title: event.title,
       description: event.description,
       date: dateString,
-      time: timeString,
-      durationMinutes: event.durationMinutes
+      time: timeString
     });
     setShowForm(true);
   };
@@ -137,8 +134,8 @@ export default function EventsManager() {
       const url = editingEvent ? '/api/events' : '/api/events';
       const method = editingEvent ? 'PUT' : 'POST';
       const body = editingEvent 
-        ? { id: editingEvent.id, title: formData.title, description: formData.description, start: utcDateTime.toISOString(), durationMinutes: formData.durationMinutes }
-        : { title: formData.title, description: formData.description, start: utcDateTime.toISOString(), durationMinutes: formData.durationMinutes };
+        ? { id: editingEvent.id, title: formData.title, description: formData.description, start: utcDateTime.toISOString() }
+        : { title: formData.title, description: formData.description, start: utcDateTime.toISOString() };
 
       const response = await fetch(url, {
         method,
@@ -248,16 +245,6 @@ export default function EventsManager() {
               required
             />
             
-            <input
-              type="number"
-              className="form-input"
-              placeholder="Duration (minutes)"
-              value={formData.durationMinutes}
-              onChange={handleInputChange('durationMinutes')}
-              min="1"
-              required
-            />
-            
             <div className="flex gap-3">
               <button type="submit" className="btn-primary">
                 {editingEvent ? 'Update Event' : 'Add Event'}
@@ -308,7 +295,6 @@ export default function EventsManager() {
                       )}
                       <div className="text-sm text-gray-600 space-y-1">
                         <p><strong>Date:</strong> {formatDate(new Date(event.start))}</p>
-                        <p><strong>Duration:</strong> {event.durationMinutes} minutes</p>
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
