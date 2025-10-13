@@ -81,7 +81,7 @@ export async function GET(req: Request) {
 
     if (download === 'csv') {
       // build CSV
-  const header = ['id', 'name', 'email', 'phone', 'address', 'town', 'state', 'message', 'createdAt'];
+  const header = ['id', 'name', 'email', 'phone', 'address', 'town', 'state', 'createdAt'];
       const rows = store.map((r) => header.map((h) => {
         const v = (r as any)[h];
         if (v === undefined || v === null) return '';
@@ -108,7 +108,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>> {
   try {
     const body = await req.json();
-    const { name, email, phone, address, town, state, message }: WaitlistFormData = body;
+    const { name, email, phone, address, town, state }: WaitlistFormData = body;
 
     if (!name || !email) {
       return NextResponse.json({ 
@@ -121,11 +121,10 @@ export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: String(name),
       email: String(email),
-  phone: phone ? String(phone) : undefined,
-  address: address ? String(address) : undefined,
-  town: town ? String(town) : undefined,
-  state: state ? String(state) : undefined,
-  message: message ? String(message) : undefined,
+      phone: phone ? String(phone) : undefined,
+      address: address ? String(address) : undefined,
+      town: town ? String(town) : undefined,
+      state: state ? String(state) : undefined,
       createdAt: new Date().toISOString(),
     };
 
@@ -171,10 +170,10 @@ export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>
           await auth.authorize();
           await sheets.spreadsheets.values.append({
             spreadsheetId: sheetId,
-            range: 'Sheet1!A:I',
+            range: 'Sheet1!A:H',
             valueInputOption: 'RAW',
             requestBody: {
-              values: [[entry.id, entry.name, entry.email, entry.phone || '', entry.address || '', entry.town || '', entry.state || '', entry.message || '', entry.createdAt]]
+              values: [[entry.id, entry.name, entry.email, entry.phone || '', entry.address || '', entry.town || '', entry.state || '', entry.createdAt]]
             },
             auth,
           });
@@ -204,7 +203,7 @@ export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>
           auth: { user: smtpUser, pass: smtpPass },
         });
 
-  const text = `New waitlist entry:\n\nName: ${entry.name}\nEmail: ${entry.email}\nPhone: ${entry.phone || ''}\nAddress: ${entry.address || ''}\nTown: ${entry.town || ''}\nState: ${entry.state || ''}\nMessage: ${entry.message || ''}\nCreatedAt: ${entry.createdAt}`;
+  const text = `New waitlist entry:\n\nName: ${entry.name}\nEmail: ${entry.email}\nPhone: ${entry.phone || ''}\nAddress: ${entry.address || ''}\nTown: ${entry.town || ''}\nState: ${entry.state || ''}\nCreatedAt: ${entry.createdAt}`;
 
         await transporter.sendMail({
           from: smtpUser,
