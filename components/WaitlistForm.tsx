@@ -37,34 +37,36 @@ const InputField = ({
   
   return (
     <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className={`h-5 w-5 ${hasError ? 'text-red-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-          </svg>
+      <div className="flex items-center gap-4">
+        <label className="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[120px]">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className={`h-5 w-5 ${hasError ? 'text-red-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+            </svg>
+          </div>
+          <input
+            type={type}
+            className={`
+              w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200
+              ${hasError 
+                ? 'border-red-300 ring-2 ring-red-200 bg-red-50' 
+                : isFocused 
+                  ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
+                  : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
+              }
+              focus:outline-none focus:bg-white
+            `}
+            placeholder={placeholder}
+            value={formData[field]}
+            onChange={handleInputChange(field)}
+            onFocus={() => setFocusedField(field)}
+            onBlur={() => setFocusedField(null)}
+            required={required}
+          />
         </div>
-        <input
-          type={type}
-          className={`
-            w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200
-            ${hasError 
-              ? 'border-red-300 ring-2 ring-red-200 bg-red-50' 
-              : isFocused 
-                ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
-                : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
-            }
-            focus:outline-none focus:bg-white
-          `}
-          placeholder={placeholder}
-          value={formData[field]}
-          onChange={handleInputChange(field)}
-          onFocus={() => setFocusedField(field)}
-          onBlur={() => setFocusedField(null)}
-          required={required}
-        />
       </div>
       {helperText && !hasError && (
         <p className="mt-1 text-xs text-gray-500">{helperText}</p>
@@ -203,31 +205,33 @@ export default function WaitlistForm() {
     rows?: number; 
   }) => (
     <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
-      <div className="relative">
-        <div className="absolute top-3 left-3 pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+      <div className="flex items-start gap-4">
+        <label className="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[120px] pt-3">
+          {label}
+        </label>
+        <div className="relative flex-1">
+          <div className="absolute top-3 left-3 pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <textarea
+            className={`
+              w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200 resize-none
+              ${focusedField === field 
+                ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
+                : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
+              }
+              focus:outline-none focus:bg-white
+            `}
+            placeholder={placeholder}
+            value={formData[field]}
+            onChange={handleInputChange(field)}
+            onFocus={() => setFocusedField(field)}
+            onBlur={() => setFocusedField(null)}
+            rows={rows}
+          />
         </div>
-        <textarea
-          className={`
-            w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200 resize-none
-            ${focusedField === field 
-              ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
-              : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
-            }
-            focus:outline-none focus:bg-white
-          `}
-          placeholder={placeholder}
-          value={formData[field]}
-          onChange={handleInputChange(field)}
-          onFocus={() => setFocusedField(field)}
-          onBlur={() => setFocusedField(null)}
-          rows={rows}
-        />
       </div>
     </div>
   );
