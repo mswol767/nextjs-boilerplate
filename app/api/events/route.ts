@@ -84,12 +84,6 @@ async function writeEvents(events: Event[]): Promise<void> {
 // GET - Retrieve all events
 export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
   try {
-    // Initialize default events if in serverless environment and store is empty
-    const config = getEventsConfig();
-    if (config.useInMemory) {
-      initializeDefaultEvents();
-    }
-    
     const events = await readEvents();
     return NextResponse.json({ 
       ok: true, 
