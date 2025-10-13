@@ -159,6 +159,34 @@ export default function Home() {
         </section>
       )}
 
+      {(activeSection === "home" || activeSection === "members") && (
+        <section id="members" className="section-container text-center">
+          <h2 className="section-title">Members Area</h2>
+          <p className="mb-6">Access exclusive member resources, meeting minutes, and club documents.</p>
+          
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                  <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C9.79 2 8 3.79 8 6v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zM10 8V6c0-1.1.9-2 2-2s2 .9 2 2v2h-4z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Member Access</h3>
+                <p className="text-sm text-gray-600">Sign in to view meeting minutes, documents, and member resources.</p>
+              </div>
+              
+              <a 
+                href="/members" 
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-sm inline-block text-center"
+              >
+                Access Members Area
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
       {(activeSection === "home" || activeSection === "contact") && (
         <section id="contact" className="section-container text-center">
           <h2 className="section-title">Contact Us</h2>
