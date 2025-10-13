@@ -30,7 +30,7 @@ export default function Login({ onSuccess, compact = false }: { onSuccess?: () =
             type="password" 
             value={pass} 
             onChange={(e) => setPass(e.target.value)} 
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200" 
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200 text-gray-900 bg-white" 
             placeholder="Enter password"
             autoComplete="current-password"
           />
@@ -84,7 +84,7 @@ export default function Login({ onSuccess, compact = false }: { onSuccess?: () =
                 type="password" 
                 value={pass} 
                 onChange={(e) => setPass(e.target.value)} 
-                className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-4 text-sm sm:text-base lg:text-lg border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200" 
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-4 text-sm sm:text-base lg:text-lg border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200 text-gray-900 bg-white" 
                 placeholder="Enter admin password"
                 autoComplete="current-password"
               />
