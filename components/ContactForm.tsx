@@ -32,8 +32,8 @@ const InputField = ({
   
   return (
     <div className="relative">
-      <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[120px]">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+        <label className="text-sm font-medium text-gray-700 sm:whitespace-nowrap sm:min-w-[120px]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
         <div className="relative flex-1">
@@ -86,8 +86,8 @@ const TextAreaField = ({
   handleInputChange: (field: keyof ContactFormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }) => (
   <div className="relative">
-    <div className="flex items-start gap-4">
-      <label className="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[120px] pt-3">
+    <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+      <label className="text-sm font-medium text-gray-700 sm:whitespace-nowrap sm:min-w-[120px] sm:pt-3">
         {label} <span className="text-red-500">*</span>
       </label>
       <div className="relative flex-1">
@@ -186,7 +186,7 @@ export default function ContactForm() {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 lg:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Contact Information Section */}
           <div className="space-y-4">
