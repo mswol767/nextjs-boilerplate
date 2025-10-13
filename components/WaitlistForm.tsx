@@ -4,6 +4,83 @@ import { useState } from "react";
 import type { WaitlistFormData } from "../types";
 import LoadingSpinner from "./LoadingSpinner";
 
+// InputField component defined outside to prevent re-creation on every render
+const InputField = ({ 
+  field, 
+  label, 
+  type = "text", 
+  placeholder, 
+  required = false, 
+  icon,
+  helperText,
+  formData,
+  fieldErrors,
+  focusedField,
+  setFocusedField,
+  handleInputChange
+}: { 
+  field: keyof WaitlistFormData; 
+  label: string; 
+  type?: string; 
+  placeholder: string; 
+  required?: boolean; 
+  icon: string;
+  helperText?: string;
+  formData: WaitlistFormData;
+  fieldErrors: Record<string, string>;
+  focusedField: string | null;
+  setFocusedField: (field: string | null) => void;
+  handleInputChange: (field: keyof WaitlistFormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}) => {
+  const hasError = fieldErrors[field];
+  const isFocused = focusedField === field;
+  
+  return (
+    <div className="relative">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg className={`h-5 w-5 ${hasError ? 'text-red-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+          </svg>
+        </div>
+        <input
+          type={type}
+          className={`
+            w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200
+            ${hasError 
+              ? 'border-red-300 ring-2 ring-red-200 bg-red-50' 
+              : isFocused 
+                ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
+                : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
+            }
+            focus:outline-none focus:bg-white
+          `}
+          placeholder={placeholder}
+          value={formData[field]}
+          onChange={handleInputChange(field)}
+          onFocus={() => setFocusedField(field)}
+          onBlur={() => setFocusedField(null)}
+          required={required}
+        />
+      </div>
+      {helperText && !hasError && (
+        <p className="mt-1 text-xs text-gray-500">{helperText}</p>
+      )}
+      {hasError && (
+        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {hasError}
+        </p>
+      )}
+    </div>
+  );
+};
+
 export default function WaitlistForm() {
   const [formData, setFormData] = useState<WaitlistFormData>({
     name: '',
@@ -113,71 +190,6 @@ export default function WaitlistForm() {
     }
   };
 
-  const InputField = ({ 
-    field, 
-    label, 
-    type = "text", 
-    placeholder, 
-    required = false, 
-    icon,
-    helperText
-  }: { 
-    field: keyof WaitlistFormData; 
-    label: string; 
-    type?: string; 
-    placeholder: string; 
-    required?: boolean; 
-    icon: string;
-    helperText?: string;
-  }) => {
-    const hasError = fieldErrors[field];
-    const isFocused = focusedField === field;
-    
-    return (
-      <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className={`h-5 w-5 ${hasError ? 'text-red-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-            </svg>
-          </div>
-          <input
-            type={type}
-            className={`
-              w-full pl-10 pr-4 py-3 border-2 rounded-lg transition-all duration-200
-              ${hasError 
-                ? 'border-red-300 ring-2 ring-red-200 bg-red-50' 
-                : isFocused 
-                  ? 'border-green-500 ring-2 ring-green-200 bg-green-50' 
-                  : 'border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200'
-              }
-              focus:outline-none focus:bg-white
-            `}
-            placeholder={placeholder}
-            value={formData[field]}
-            onChange={handleInputChange(field)}
-            onFocus={() => setFocusedField(field)}
-            onBlur={() => setFocusedField(null)}
-            required={required}
-          />
-        </div>
-        {helperText && !hasError && (
-          <p className="mt-1 text-xs text-gray-500">{helperText}</p>
-        )}
-        {hasError && (
-          <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {hasError}
-          </p>
-        )}
-      </div>
-    );
-  };
 
   const TextAreaField = ({ 
     field, 
@@ -250,6 +262,11 @@ export default function WaitlistForm() {
                 placeholder="Enter your full name"
                 required
                 icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                formData={formData}
+                fieldErrors={fieldErrors}
+                focusedField={focusedField}
+                setFocusedField={setFocusedField}
+                handleInputChange={handleInputChange}
               />
               <InputField
                 field="email"
@@ -258,6 +275,11 @@ export default function WaitlistForm() {
                 placeholder="your.email@example.com"
                 required
                 icon="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                formData={formData}
+                fieldErrors={fieldErrors}
+                focusedField={focusedField}
+                setFocusedField={setFocusedField}
+                handleInputChange={handleInputChange}
               />
             </div>
             
@@ -267,6 +289,11 @@ export default function WaitlistForm() {
               type="tel"
               placeholder="(555) 123-4567"
               icon="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+              formData={formData}
+              fieldErrors={fieldErrors}
+              focusedField={focusedField}
+              setFocusedField={setFocusedField}
+              handleInputChange={handleInputChange}
             />
           </div>
 
@@ -283,6 +310,11 @@ export default function WaitlistForm() {
               placeholder="123 Main Street, Apt 4B"
               required
               icon="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              formData={formData}
+              fieldErrors={fieldErrors}
+              focusedField={focusedField}
+              setFocusedField={setFocusedField}
+              handleInputChange={handleInputChange}
             />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -292,6 +324,11 @@ export default function WaitlistForm() {
                 placeholder="Your town or city"
                 required
                 icon="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                formData={formData}
+                fieldErrors={fieldErrors}
+                focusedField={focusedField}
+                setFocusedField={setFocusedField}
+                handleInputChange={handleInputChange}
               />
               <InputField
                 field="state"
@@ -299,6 +336,11 @@ export default function WaitlistForm() {
                 placeholder="Your state"
                 required
                 icon="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                formData={formData}
+                fieldErrors={fieldErrors}
+                focusedField={focusedField}
+                setFocusedField={setFocusedField}
+                handleInputChange={handleInputChange}
               />
             </div>
           </div>
