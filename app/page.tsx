@@ -89,7 +89,7 @@ export default function Home() {
       )}
 
       {(activeSection === "home" || activeSection === "membership") && (
-        <section id="membership" className="bg-green-100 py-12 px-4 sm:px-8">
+        <section id="membership" className="section-container">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Membership (Currently Full)</h2>
             <p className="mb-4 text-gray-700">
