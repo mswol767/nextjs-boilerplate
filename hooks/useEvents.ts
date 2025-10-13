@@ -8,14 +8,14 @@ export function useEvents() {
   const [showPast, setShowPast] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Load events from events API (working solution), fallback to defaults
+  // Load events from Google Sheets, fallback to events API, then defaults
   useEffect(() => {
     let cancelled = false;
     
     async function load() {
       try {
-        // Use the working events API
-        const res = await fetch('/api/events');
+        // First try Google Sheets API
+        const res = await fetch('/api/sheets');
         if (res.ok) {
           const result = await res.json();
           if (result.ok && result.data) {
@@ -25,10 +25,21 @@ export function useEvents() {
           }
         }
         
-        // Fallback to public/events.json
-        const res2 = await fetch('/events.json');
+        // Fallback to events API
+        const res2 = await fetch('/api/events');
         if (res2.ok) {
-          const data = await res2.json();
+          const result = await res2.json();
+          if (result.ok && result.data) {
+            if (cancelled) return;
+            setEventsData(result.data);
+            return;
+          }
+        }
+        
+        // Fallback to public/events.json
+        const res3 = await fetch('/events.json');
+        if (res3.ok) {
+          const data = await res3.json();
           if (cancelled) return;
           // convert start to Date
           const parsed = data.map((e: any) => ({ ...e, start: new Date(e.start) }));
