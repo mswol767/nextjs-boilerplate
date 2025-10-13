@@ -239,8 +239,8 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
       {/* Members Login Dropdown */}
       {showMembersLogin && (
         <div className="fixed top-16 sm:top-20 right-4 sm:right-6 z-50" data-members-dropdown>
-          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-80 max-w-[calc(100vw-2rem)]">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-3 w-80 max-w-[calc(100vw-2rem)]">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -259,7 +259,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
                 </svg>
               </button>
             </div>
-            <Login onSuccess={() => setShowMembersLogin(false)} />
+              <Login onSuccess={() => setShowMembersLogin(false)} compact={true} />
           </div>
         </div>
       )}

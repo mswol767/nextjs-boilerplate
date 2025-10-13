@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function Login({ onSuccess }: { onSuccess?: () => void }) {
+export default function Login({ onSuccess, compact = false }: { onSuccess?: () => void; compact?: boolean }) {
   const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,6 +19,48 @@ export default function Login({ onSuccess }: { onSuccess?: () => void }) {
     } catch (err: any) {
       setErr(err?.message || 'Login failed');
     } finally { setLoading(false); }
+  }
+
+  if (compact) {
+    return (
+      <form onSubmit={submit} className="space-y-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
+          <input 
+            type="password" 
+            value={pass} 
+            onChange={(e) => setPass(e.target.value)} 
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200" 
+            placeholder="Enter password"
+            autoComplete="current-password"
+          />
+        </div>
+        
+        {err && (
+          <div className="p-2 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-xs text-red-700 font-medium">{err}</p>
+          </div>
+        )}
+        
+        <button 
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-3 rounded-md shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm" 
+          disabled={loading} 
+          type="submit"
+        >
+          {loading ? (
+            <div className="flex items-center justify-center gap-2">
+              <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Signing in...</span>
+            </div>
+          ) : (
+            <span>Sign In</span>
+          )}
+        </button>
+      </form>
+    );
   }
 
   return (
