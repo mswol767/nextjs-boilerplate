@@ -8,11 +8,13 @@ const EVENTS_FILE = path.join(process.cwd(), 'data', 'events.json');
 
 // In-memory store for production environments
 let inMemoryEvents: Event[] = [];
+let hasInitializedDefaults = false;
 
 // Initialize with default events for serverless environments
 function initializeDefaultEvents(): void {
-  if (inMemoryEvents.length === 0) {
+  if (!hasInitializedDefaults) {
     inMemoryEvents = [...DEFAULT_EVENTS];
+    hasInitializedDefaults = true;
   }
 }
 
@@ -70,10 +72,12 @@ async function writeEvents(events: Event[]): Promise<void> {
       console.error('Failed to write to file system, falling back to in-memory store:', error);
       // Fallback to in-memory store if file system write fails
       inMemoryEvents = events;
+      hasInitializedDefaults = true; // Mark that we've modified events
     }
   } else {
     // Fallback to in-memory store
     inMemoryEvents = events;
+    hasInitializedDefaults = true; // Mark that we've modified events
   }
 }
 
