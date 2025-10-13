@@ -85,7 +85,7 @@ export function useEvents() {
       },
     ];
     
-    const events = eventsData && eventsData.length ? eventsData : defaults;
+    const events = eventsData !== null ? eventsData : defaults;
     const upcoming = events.filter((e: Event) => new Date(e.start) >= now);
     const past = events.filter((e: Event) => new Date(e.start) < now);
     const shown = showPast ? [...upcoming, ...past] : upcoming;
