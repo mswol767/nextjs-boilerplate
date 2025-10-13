@@ -49,19 +49,15 @@ async function readEvents(): Promise<Event[]> {
 // Helper function to write events
 async function writeEvents(events: Event[]): Promise<void> {
   const config = getEventsConfig();
-  console.log('writeEvents - Config:', config);
-  console.log('writeEvents - EVENTS_FILE path:', EVENTS_FILE);
   
   if (config.useInMemory) {
     // In serverless, update in-memory store
-    console.log('writeEvents - Using in-memory store');
     inMemoryEvents = events;
     return;
   }
 
   if (config.useFileSystem) {
     try {
-      console.log('writeEvents - Using file system storage');
       const dir = path.dirname(EVENTS_FILE);
       await fs.mkdir(dir, { recursive: true });
       
@@ -71,9 +67,7 @@ async function writeEvents(events: Event[]): Promise<void> {
         start: event.start.toISOString()
       }));
       
-      console.log('writeEvents - Writing to file:', EVENTS_FILE);
       await fs.writeFile(EVENTS_FILE, JSON.stringify(eventsForStorage, null, 2), 'utf8');
-      console.log('writeEvents - Successfully wrote to file');
     } catch (error) {
       console.error('Failed to write to file system, falling back to in-memory store:', error);
       // Fallback to in-memory store if file system write fails
@@ -82,7 +76,6 @@ async function writeEvents(events: Event[]): Promise<void> {
     }
   } else {
     // Fallback to in-memory store
-    console.log('writeEvents - Fallback to in-memory store');
     inMemoryEvents = events;
     hasInitializedDefaults = true; // Mark that we've modified events
   }
@@ -109,7 +102,6 @@ export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
 export async function POST(req: Request): Promise<NextResponse<ApiResponse<Event>>> {
   try {
     const body = await req.json();
-    console.log('POST /api/events - Request body:', body);
     const { title, description, start, durationMinutes }: Partial<Event> = body;
 
     // Validation
@@ -155,9 +147,7 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse<Event
     };
 
     events.push(newEvent);
-    console.log('POST /api/events - About to write events:', events.length, 'events');
     await writeEvents(events);
-    console.log('POST /api/events - Successfully wrote events to file');
 
     return NextResponse.json({ 
       ok: true, 
