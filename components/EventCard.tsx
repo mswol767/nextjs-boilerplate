@@ -30,14 +30,6 @@ export default function EventCard({ event }: EventCardProps) {
     return `${y}${m}${day}T${hh}${mm}${ss}Z`;
   };
 
-  const getGoogleUrl = (ev: Event) => {
-    const start = toGoogleDate(eventStart);
-    const end = toGoogleDate(new Date(eventStart.getTime() + 2 * 60 * 60000)); // Default 2 hours
-    const text = encodeURIComponent(ev.title);
-    const details = encodeURIComponent(ev.description || '');
-    const location = encodeURIComponent('Cromwell Fish & Game Club');
-    return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}&sf=true&output=xml`;
-  };
 
   const buildICS = (ev: Event) => {
     const dtstamp = toGoogleDate(new Date());
@@ -84,12 +76,12 @@ export default function EventCard({ event }: EventCardProps) {
       <p className="text-sm mb-3 text-gray-700">{event.description}</p>
       <div className="flex gap-3">
         <a 
-          href={getGoogleUrl(event)} 
+          href="https://calendar.google.com/calendar/embed?src=cromwellfgc@gmail.com&ctz=America/New_York" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="btn-primary"
         >
-          Add to Google Calendar
+          View Full Calendar
         </a>
         <button 
           onClick={() => downloadICS(event)} 
