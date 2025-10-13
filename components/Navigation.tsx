@@ -238,7 +238,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
 
       {/* Members Login Dropdown */}
       {showMembersLogin && (
-        <div className="absolute top-full right-4 sm:right-6 mt-2 z-50" data-members-dropdown>
+        <div className="fixed top-16 sm:top-20 right-4 sm:right-6 z-50" data-members-dropdown>
           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-80 max-w-[calc(100vw-2rem)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
