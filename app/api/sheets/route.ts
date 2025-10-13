@@ -17,9 +17,9 @@ export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
       }, { status: 503 });
     }
 
-    // Fetch data from Google Sheets
+    // Fetch data from Google Sheets (using Sheet1 as default)
     const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Events!A:D?key=${GOOGLE_API_KEY}`
+      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/Sheet1!A:D?key=${GOOGLE_API_KEY}`
     );
 
     if (!response.ok) {
@@ -64,10 +64,10 @@ export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
         };
       })
       .filter((event: Event) => {
-        // Only include future events or events from the last 7 days
+        // Only include future events or events from the last 30 days
         const now = new Date();
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return event.start >= weekAgo;
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return event.start >= monthAgo;
       })
       .sort((a: Event, b: Event) => a.start.getTime() - b.start.getTime()); // Sort by date
 
