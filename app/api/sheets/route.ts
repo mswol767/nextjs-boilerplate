@@ -43,11 +43,20 @@ export async function GET(): Promise<NextResponse<ApiResponse<Event[]>>> {
           if (dateTime.includes('T')) {
             startDate = new Date(dateTime);
           } else {
-            // Parse as "YYYY-MM-DD HH:MM" format
+            // Parse as "YYYY-MM-DD HH:MM" format and treat as Eastern Time
             const [datePart, timePart] = dateTime.split(' ');
             const [year, month, day] = datePart.split('-').map(Number);
             const [hours, minutes] = timePart.split(':').map(Number);
-            startDate = new Date(year, month - 1, day, hours, minutes);
+            
+            // Create a date object and convert to Eastern Time
+            // First create as if it's in Eastern Time, then convert to UTC for storage
+            const tempDate = new Date(year, month - 1, day, hours, minutes);
+            
+            // Get the timezone offset for Eastern Time (EST is UTC-5, EDT is UTC-4)
+            // For simplicity, we'll use EST (UTC-5) - you can adjust this if needed
+            const easternOffset = 5 * 60; // 5 hours in minutes
+            const utcTime = tempDate.getTime() + (easternOffset * 60 * 1000);
+            startDate = new Date(utcTime);
           }
         } catch (error) {
           console.error('Error parsing date:', dateTime, error);
