@@ -13,7 +13,8 @@ export default function EventsManager() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    start: '',
+    date: '',
+    time: '',
     durationMinutes: 60
   });
 
@@ -49,7 +50,8 @@ export default function EventsManager() {
     setFormData({
       title: '',
       description: '',
-      start: '',
+      date: '',
+      time: '',
       durationMinutes: 60
     });
     setEditingEvent(null);
@@ -75,14 +77,18 @@ export default function EventsManager() {
     const day = String(easternDate.getDate()).padStart(2, '0');
     const hours = String(easternDate.getHours()).padStart(2, '0');
     const minutes = String(easternDate.getMinutes()).padStart(2, '0');
-    const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
     
-    console.log('Form datetime string:', localDateTime);
+    const dateString = `${year}-${month}-${day}`;
+    const timeString = `${hours}:${minutes}`;
+    
+    console.log('Form date string:', dateString);
+    console.log('Form time string:', timeString);
     
     setFormData({
       title: event.title,
       description: event.description,
-      start: localDateTime,
+      date: dateString,
+      time: timeString,
       durationMinutes: event.durationMinutes
     });
     setShowForm(true);
@@ -92,22 +98,23 @@ export default function EventsManager() {
     e.preventDefault();
     setError('');
 
-    if (!formData.title.trim() || !formData.start) {
-      setError('Title and start date are required');
+    if (!formData.title.trim() || !formData.date || !formData.time) {
+      setError('Title, date, and time are required');
       return;
     }
 
     try {
-      // Convert the datetime-local input to Eastern Time
-      // The datetime-local input gives us a string like "2025-01-15T18:00"
+      // Combine the separate date and time fields
+      // The date input gives us a string like "2025-01-15"
+      // The time input gives us a string like "18:00"
       // We need to treat this as Eastern Time and convert it to UTC for storage
       
-      console.log('Form input:', formData.start);
+      console.log('Form date input:', formData.date);
+      console.log('Form time input:', formData.time);
       
-      // Parse the datetime-local string
-      const [datePart, timePart] = formData.start.split('T');
-      const [year, month, day] = datePart.split('-').map(Number);
-      const [hours, minutes] = timePart.split(':').map(Number);
+      // Parse the date and time strings
+      const [year, month, day] = formData.date.split('-').map(Number);
+      const [hours, minutes] = formData.time.split(':').map(Number);
       
       console.log('Parsed:', { year, month, day, hours, minutes });
       
@@ -130,8 +137,8 @@ export default function EventsManager() {
       const url = editingEvent ? '/api/events' : '/api/events';
       const method = editingEvent ? 'PUT' : 'POST';
       const body = editingEvent 
-        ? { id: editingEvent.id, ...formData, start: utcDateTime.toISOString() }
-        : { ...formData, start: utcDateTime.toISOString() };
+        ? { id: editingEvent.id, title: formData.title, description: formData.description, start: utcDateTime.toISOString(), durationMinutes: formData.durationMinutes }
+        : { title: formData.title, description: formData.description, start: utcDateTime.toISOString(), durationMinutes: formData.durationMinutes };
 
       const response = await fetch(url, {
         method,
@@ -226,10 +233,18 @@ export default function EventsManager() {
             />
             
             <input
-              type="datetime-local"
+              type="date"
               className="form-input"
-              value={formData.start}
-              onChange={handleInputChange('start')}
+              value={formData.date}
+              onChange={handleInputChange('date')}
+              required
+            />
+            
+            <input
+              type="time"
+              className="form-input"
+              value={formData.time}
+              onChange={handleInputChange('time')}
               required
             />
             
