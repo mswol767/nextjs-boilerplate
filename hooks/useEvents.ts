@@ -8,14 +8,14 @@ export function useEvents() {
   const [showPast, setShowPast] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Load events from Google Calendar API, fallback to events API, then defaults
+  // Load events from Google Sheets, fallback to events API, then defaults
   useEffect(() => {
     let cancelled = false;
     
     async function load() {
       try {
-        // First try Google Calendar API
-        const res = await fetch('/api/calendar');
+        // First try Google Sheets API
+        const res = await fetch('/api/sheets');
         if (res.ok) {
           const result = await res.json();
           if (result.ok && result.data) {
