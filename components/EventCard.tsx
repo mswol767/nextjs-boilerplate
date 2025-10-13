@@ -32,7 +32,7 @@ export default function EventCard({ event }: EventCardProps) {
 
   const getGoogleUrl = (ev: Event) => {
     const start = toGoogleDate(eventStart);
-    const end = toGoogleDate(new Date(eventStart.getTime() + ev.durationMinutes * 60000));
+    const end = toGoogleDate(new Date(eventStart.getTime() + 2 * 60 * 60000)); // Default 2 hours
     const text = encodeURIComponent(ev.title);
     const details = encodeURIComponent(ev.description || '');
     const location = encodeURIComponent('Cromwell Fish & Game Club');
@@ -42,7 +42,7 @@ export default function EventCard({ event }: EventCardProps) {
   const buildICS = (ev: Event) => {
     const dtstamp = toGoogleDate(new Date());
     const dtstart = toGoogleDate(eventStart);
-    const dtend = toGoogleDate(new Date(eventStart.getTime() + ev.durationMinutes * 60000));
+    const dtend = toGoogleDate(new Date(eventStart.getTime() + 2 * 60 * 60000)); // Default 2 hours
     const uid = `${ev.id}@cromwellfgc.local`;
     return [
       'BEGIN:VCALENDAR',
@@ -79,7 +79,7 @@ export default function EventCard({ event }: EventCardProps) {
     <article className="card">
       <h3 className="card-header">{event.title}</h3>
       <p className="text-sm text-green-700 mb-2">
-        {formatLocal(eventStart)} • {Math.round(event.durationMinutes/60)} hr{event.durationMinutes > 60 ? 's' : ''}
+        {formatLocal(eventStart)}
       </p>
       <p className="text-sm mb-3 text-gray-700">{event.description}</p>
       <div className="flex gap-3">

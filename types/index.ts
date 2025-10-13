@@ -4,7 +4,6 @@ export interface Event {
   title: string;
   description: string;
   start: Date;
-  durationMinutes: number;
 }
 
 export interface EventComputed {
