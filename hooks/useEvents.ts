@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Event, EventComputed } from "../types";
 
 export function useEvents() {
@@ -51,9 +51,9 @@ export function useEvents() {
   }, [refreshTrigger]);
 
   // Function to refresh events data
-  const refreshEvents = () => {
+  const refreshEvents = useCallback(() => {
     setRefreshTrigger(prev => prev + 1);
-  };
+  }, []);
 
   const eventsComputed = useMemo((): EventComputed => {
     const now = new Date();
