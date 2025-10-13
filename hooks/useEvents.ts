@@ -57,30 +57,28 @@ export function useEvents() {
 
   const eventsComputed = useMemo((): EventComputed => {
     const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
     
-    // Create upcoming events for the next few months
+    // Create upcoming events for the next few months - using static dates to avoid hydration mismatch
     const defaults: Event[] = [
       { 
         id: 'monthly-meeting', 
         title: 'Monthly Club Meeting', 
         description: 'Join us for our monthly club meeting to discuss upcoming events and club business.', 
-        start: new Date(currentYear, currentMonth + 1, 15, 19, 0), 
+        start: new Date('2025-01-15T19:00:00'), 
         durationMinutes: 120 
       },
       { 
         id: 'hunting-season', 
         title: 'Hunting Season Kickoff', 
         description: 'Celebrate the start of hunting season with food, drinks, and planning sessions.', 
-        start: new Date(currentYear, currentMonth + 1, 20, 18, 0), 
+        start: new Date('2025-01-20T18:00:00'), 
         durationMinutes: 180 
       },
       { 
         id: 'annual-banquet', 
         title: 'Annual Club Banquet', 
         description: 'Our annual celebration with awards, dinner, and entertainment for all members.', 
-        start: new Date(currentYear + 1, 0, 25, 17, 0), 
+        start: new Date('2025-01-25T17:00:00'), 
         durationMinutes: 240 
       },
     ];
