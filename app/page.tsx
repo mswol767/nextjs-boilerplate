@@ -53,13 +53,58 @@ export default function Home() {
         <section id="about" className="section-container">
           <div className="text-center">
             <h2 className="section-title">About Us</h2>
-            <p className="mb-4 text-gray-700">
+            <p className="mb-8 text-gray-700 max-w-3xl mx-auto">
               Cromwell Fish & Game Club is a community-run organization dedicated to promoting responsible outdoor recreation,
               conservation, and education. Our members enjoy regular meetings, youth events, and habitat stewardship projects.
             </p>
-            <p className="text-gray-700">
-              We welcome hunters, anglers, and anyone interested in learning outdoor skills or supporting local conservation efforts.
-            </p>
+            
+            {/* Feature Boxes */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+              {/* Shooting Range */}
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Shooting Range</h3>
+                <p className="text-gray-600">
+                  Practice your marksmanship at our well-maintained shooting range. Open to members for target practice and training sessions.
+                </p>
+              </div>
+
+              {/* Pheasant Hunting */}
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Pheasant Hunting</h3>
+                <p className="text-gray-600">
+                  Experience premier pheasant hunting on our managed grounds. Seasonal hunting opportunities for members and guests.
+                </p>
+              </div>
+
+              {/* Skeet House */}
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Skeet House</h3>
+                <p className="text-gray-600">
+                  Test your skills at our skeet shooting facility. Perfect for both beginners learning the sport and experienced shooters.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-12">
+              <p className="text-gray-700">
+                We welcome hunters, anglers, and anyone interested in learning outdoor skills or supporting local conservation efforts.
+              </p>
+            </div>
           </div>
         </section>
       )}
