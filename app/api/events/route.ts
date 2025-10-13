@@ -7,19 +7,19 @@ let events: Event[] = [
     id: 'monthly-meeting',
     title: 'Monthly Club Meeting',
     description: 'Join us for our monthly club meeting to discuss upcoming events and club business.',
-    start: new Date('2025-01-15T19:00:00')
+    start: new Date('2025-02-15T19:00:00')
   },
   {
     id: 'hunting-season',
     title: 'Hunting Season Kickoff',
     description: 'Celebrate the start of hunting season with food, drinks, and planning sessions.',
-    start: new Date('2025-01-20T18:00:00')
+    start: new Date('2025-02-20T18:00:00')
   },
   {
     id: 'annual-banquet',
     title: 'Annual Club Banquet',
     description: 'Our annual celebration with awards, dinner, and entertainment for all members.',
-    start: new Date('2025-01-25T17:00:00')
+    start: new Date('2025-02-25T17:00:00')
   }
 ];
 

@@ -10,7 +10,7 @@
     "import-pdfs": "node scripts/import-pdfs.js"
   },
   "dependencies": {
-    "googleapis": "121.0.0",
+    "googleapis": "^121.0.0",
     "next": "15.5.4",
     "nodemailer": "6.9.4",
     "react": "19.1.0",
