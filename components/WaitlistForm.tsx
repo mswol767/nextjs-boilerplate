@@ -29,36 +29,8 @@ export default function WaitlistForm() {
         setFieldErrors(prev => ({ ...prev, [field]: '' }));
       }
       
-      // Real-time validation for address field
-      if (field === 'address' && value.trim()) {
-        validateAddressField(value.trim());
-      }
     };
 
-  const validateAddressField = (address: string) => {
-    let error = '';
-    
-    if (address.length < 10) {
-      error = 'Address too short (minimum 10 characters)';
-    } else if (!/^\d+/.test(address)) {
-      error = 'Please include a street number at the beginning';
-    } else if (!/[a-zA-Z]/.test(address)) {
-      error = 'Please include street name';
-    } else {
-      const addressPatterns = [
-        /\d+\s+[a-zA-Z\s]+(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|court|ct|place|pl|way|circle|cir)/i,
-        /\d+\s+[a-zA-Z\s]+(?:north|south|east|west|n|s|e|w)\s+[a-zA-Z\s]+/i,
-        /\d+\s+[a-zA-Z\s]+(?:apartment|apt|unit|suite|ste|#)/i
-      ];
-      
-      const hasValidPattern = addressPatterns.some(pattern => pattern.test(address));
-      if (!hasValidPattern) {
-        error = 'Include street type (St, Ave, Rd, etc.)';
-      }
-    }
-    
-    setFieldErrors(prev => ({ ...prev, address: error }));
-  };
 
   const clearForm = () => {
     setFormData({
@@ -75,37 +47,9 @@ export default function WaitlistForm() {
   };
 
   const validateForm = (): string | null => {
-    // Enhanced address validation
-    const address = formData.address.trim();
-    if (!address) {
+    // Basic required field validation
+    if (!formData.address.trim()) {
       return 'Please provide your address.';
-    }
-
-    // Check minimum length
-    if (address.length < 10) {
-      return 'Please enter a complete address (at least 10 characters).';
-    }
-
-    // Must contain a street number at the beginning
-    if (!/^\d+/.test(address)) {
-      return 'Please include a street number at the beginning of your address (e.g., "123 Main St").';
-    }
-
-    // Must contain at least one letter (street name)
-    if (!/[a-zA-Z]/.test(address)) {
-      return 'Please include the street name in your address.';
-    }
-
-    // Check for common address patterns
-    const addressPatterns = [
-      /\d+\s+[a-zA-Z\s]+(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|court|ct|place|pl|way|circle|cir)/i,
-      /\d+\s+[a-zA-Z\s]+(?:north|south|east|west|n|s|e|w)\s+[a-zA-Z\s]+/i,
-      /\d+\s+[a-zA-Z\s]+(?:apartment|apt|unit|suite|ste|#)/i
-    ];
-
-    const hasValidPattern = addressPatterns.some(pattern => pattern.test(address));
-    if (!hasValidPattern) {
-      return 'Please enter a complete address with street number and name (e.g., "123 Main Street").';
     }
 
     // Require town and state
@@ -339,7 +283,6 @@ export default function WaitlistForm() {
               placeholder="123 Main Street, Apt 4B"
               required
               icon="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              helperText="Include street number, name, and type (St, Ave, Rd, etc.)"
             />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
