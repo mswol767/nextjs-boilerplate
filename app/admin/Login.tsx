@@ -23,7 +23,7 @@ export default function Login({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <div className="min-h-screen bg-green-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm sm:max-w-md lg:max-w-xl">
+      <div className="w-full max-w-sm sm:max-w-md lg:max-w-2xl xl:max-w-3xl">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 sm:p-8 lg:p-10">
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-3 sm:mb-4">
