@@ -259,7 +259,7 @@ export default function WaitlistForm() {
               <h4 className="text-lg font-semibold text-gray-900">Personal Information</h4>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <InputField
                 field="name"
                 label="Full Name"
