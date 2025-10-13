@@ -101,7 +101,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         ? 'bg-green-900/95 backdrop-blur-sm shadow-lg' 
         : 'bg-green-800'
       }
-      ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}
+      ${menuOpen ? 'h-auto' : 'h-16 sm:h-20'}
     `}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
         {/* Logo/Brand */}
@@ -163,20 +163,6 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         </nav>
       </div>
       
-      {/* Show all button when in single-section view */}
-      {activeSection !== 'home' && (
-        <div className="max-w-7xl mx-auto px-4 pb-2">
-          <button 
-            onClick={() => onNavClick({ preventDefault: () => {} } as any, "home")} 
-            className="group flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
-          >
-            <svg className="w-4 h-4 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none">
-              <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>Show all sections</span>
-          </button>
-        </div>
-      )}
       
       {/* Mobile Menu */}
       {menuOpen && (

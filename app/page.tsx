@@ -49,8 +49,7 @@ export default function Home() {
       </section>
 
       {/* About Us Section */}
-      {(activeSection === "home" || activeSection === "about") && (
-        <section id="about" className="section-container">
+      <section id="about" className="section-container">
           <div className="text-center">
             <h2 className="section-title">About Us</h2>
             <p className="mb-8 text-gray-700 max-w-3xl mx-auto">
@@ -115,11 +114,9 @@ export default function Home() {
             </div>
           </div>
         </section>
-      )}
 
-      {/* Conditionally rendered content sections */}
-      {(activeSection === "home" || activeSection === "events") && (
-        <section id="events" className="section-container">
+      {/* Events Section */}
+      <section id="events" className="section-container">
           <h2 className="section-title">Upcoming Events</h2>
           {/* Event cards */}
           <div className="flex items-center justify-between mb-4">
@@ -139,10 +136,9 @@ export default function Home() {
             ))}
           </div>
         </section>
-      )}
 
-      {(activeSection === "home" || activeSection === "membership") && (
-        <section id="membership" className="section-container">
+      {/* Membership Section */}
+      <section id="membership" className="section-container">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Membership (Currently Full)</h2>
             <p className="mb-4 text-gray-700">
@@ -157,17 +153,15 @@ export default function Home() {
             </p>
           </div>
         </section>
-      )}
 
-      {(activeSection === "home" || activeSection === "contact") && (
-        <section id="contact" className="section-container text-center">
+      {/* Contact Section */}
+      <section id="contact" className="section-container text-center">
           <h2 className="section-title">Contact Us</h2>
           <p className="mb-6">Send us a message and we'll get back to you as soon as we can.</p>
 
           {/* Contact form */}
           <ContactForm />
         </section>
-      )}
 
       {/* Footer */}
       <footer className="bg-green-800 text-white py-6 text-center">
