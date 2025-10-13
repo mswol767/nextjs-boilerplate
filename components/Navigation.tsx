@@ -259,7 +259,10 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
                 </svg>
               </button>
             </div>
-              <Login onSuccess={() => setShowMembersLogin(false)} compact={true} />
+              <Login onSuccess={() => {
+                setShowMembersLogin(false);
+                window.location.href = '/members';
+              }} compact={true} />
           </div>
         </div>
       )}
