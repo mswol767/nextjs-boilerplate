@@ -9,14 +9,15 @@ export function getEventsConfig(): EventsConfig {
   const isVercel = process.env.VERCEL === '1';
   const isAWS = process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
   const isProduction = process.env.NODE_ENV === 'production';
-  // For now, always use file system to ensure persistence
-  // In the future, we can implement proper database storage
-  const isServerless = false; // Disable serverless mode temporarily
+  
+  // On Vercel, we need to use in-memory storage since file system is read-only
+  // In local development, we can use file system
+  const isServerless = isVercel || isAWS;
 
   return {
-    useFileSystem: true, // Always use file system for now
-    useInMemory: false,  // Disable in-memory storage
-    useExternalStorage: false // Can be enabled later for database integration
+    useFileSystem: !isServerless, // Use file system only in local development
+    useInMemory: isServerless,    // Use in-memory storage on Vercel/AWS
+    useExternalStorage: false     // Can be enabled later for database integration
   };
 }
 

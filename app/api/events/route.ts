@@ -23,7 +23,24 @@ async function readEvents(): Promise<Event[]> {
   const config = getEventsConfig();
   
   if (config.useInMemory) {
-    // In serverless, use in-memory store
+    // In serverless (Vercel), use in-memory store
+    // If in-memory store is empty, try to load from public/events.json
+    if (inMemoryEvents.length === 0) {
+      try {
+        const publicEventsFile = path.join(process.cwd(), 'public', 'events.json');
+        const data = await fs.readFile(publicEventsFile, 'utf8');
+        const events = JSON.parse(data);
+        // Convert start dates back to Date objects and store in memory
+        inMemoryEvents = events.map((event: any) => ({
+          ...event,
+          start: new Date(event.start)
+        }));
+      } catch (error) {
+        // If public/events.json doesn't exist, use default events
+        inMemoryEvents = [...DEFAULT_EVENTS];
+        hasInitializedDefaults = true;
+      }
+    }
     return inMemoryEvents;
   }
 
@@ -50,9 +67,25 @@ async function readEvents(): Promise<Event[]> {
 async function writeEvents(events: Event[]): Promise<void> {
   const config = getEventsConfig();
   
+  // Convert Date objects to ISO strings for storage
+  const eventsForStorage = events.map(event => ({
+    ...event,
+    start: event.start.toISOString()
+  }));
+  
   if (config.useInMemory) {
-    // In serverless, update in-memory store
+    // In serverless (Vercel), update in-memory store
     inMemoryEvents = events;
+    hasInitializedDefaults = true;
+    
+    // Also try to write to public folder for persistence (if possible)
+    try {
+      const publicEventsFile = path.join(process.cwd(), 'public', 'events.json');
+      await fs.writeFile(publicEventsFile, JSON.stringify(eventsForStorage, null, 2), 'utf8');
+    } catch (error) {
+      // This might fail on Vercel, but that's okay - in-memory will work
+      console.log('Could not write to public folder (expected on Vercel):', error.message);
+    }
     return;
   }
 
@@ -60,24 +93,17 @@ async function writeEvents(events: Event[]): Promise<void> {
     try {
       const dir = path.dirname(EVENTS_FILE);
       await fs.mkdir(dir, { recursive: true });
-      
-      // Convert Date objects to ISO strings for storage
-      const eventsForStorage = events.map(event => ({
-        ...event,
-        start: event.start.toISOString()
-      }));
-      
       await fs.writeFile(EVENTS_FILE, JSON.stringify(eventsForStorage, null, 2), 'utf8');
     } catch (error) {
       console.error('Failed to write to file system, falling back to in-memory store:', error);
       // Fallback to in-memory store if file system write fails
       inMemoryEvents = events;
-      hasInitializedDefaults = true; // Mark that we've modified events
+      hasInitializedDefaults = true;
     }
   } else {
     // Fallback to in-memory store
     inMemoryEvents = events;
-    hasInitializedDefaults = true; // Mark that we've modified events
+    hasInitializedDefaults = true;
   }
 }
 
