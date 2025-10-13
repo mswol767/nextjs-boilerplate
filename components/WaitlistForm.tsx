@@ -90,8 +90,7 @@ export default function WaitlistForm() {
     phone: '',
     address: '',
     town: '',
-    state: '',
-    message: ''
+    state: ''
   });
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -118,8 +117,7 @@ export default function WaitlistForm() {
       phone: '',
       address: '',
       town: '',
-      state: '',
-      message: ''
+      state: ''
     });
     setStatus('');
     setFieldErrors({});
@@ -349,20 +347,6 @@ export default function WaitlistForm() {
             </div>
           </div>
 
-          {/* Message Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-6 bg-green-500 rounded-full"></div>
-              <h4 className="text-lg font-semibold text-gray-900">Tell Us About Yourself</h4>
-            </div>
-            
-            <TextAreaField
-              field="message"
-              label="Interests & Notes"
-              placeholder="What activities interest you? Any questions or additional information you'd like to share?"
-              rows={4}
-            />
-          </div>
 
           {/* Submit Section */}
           <div className="pt-6 border-t border-gray-200">
