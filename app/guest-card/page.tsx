@@ -187,7 +187,7 @@ END:VCARD`;
                   type="text"
                   value={formData.guestName}
                   onChange={handleInputChange('guestName')}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 text-gray-900"
                   placeholder="Enter guest's full name"
                   required
                 />
@@ -201,7 +201,7 @@ END:VCARD`;
                   type="text"
                   value={formData.memberName}
                   onChange={handleInputChange('memberName')}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 text-gray-900"
                   placeholder="Enter member's name"
                   required
                 />
@@ -215,7 +215,7 @@ END:VCARD`;
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={handleInputChange('phoneNumber')}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 text-gray-900"
                   placeholder="(555) 123-4567"
                   required
                 />
@@ -229,7 +229,7 @@ END:VCARD`;
                   type="date"
                   value={formData.huntDate}
                   onChange={handleInputChange('huntDate')}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 text-gray-900"
                   required
                 />
               </div>
@@ -242,7 +242,7 @@ END:VCARD`;
                   <select
                     value={formData.huntType}
                     onChange={handleInputChange('huntType')}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-200 bg-white text-gray-900"
                     required
                   >
                     <option value="">Select hunt type...</option>
