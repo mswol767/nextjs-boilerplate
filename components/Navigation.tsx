@@ -130,16 +130,16 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
         ? 'bg-green-900/95 backdrop-blur-sm shadow-lg' 
         : 'bg-green-800'
       }
-      ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-16 sm:h-20')}
+      ${menuOpen ? 'h-auto' : (activeSection === 'home' ? 'h-auto' : 'h-20 sm:h-24')}
     `}>
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 sm:p-6">
         {/* Logo/Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L3 7v13h6v-7h6v7h6V7z" fill="currentColor"/>
-            </svg>
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Cromwell Fish & Game Club Logo" 
+            className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+          />
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             Cromwell Fish & Game Club
           </h1>
@@ -238,7 +238,7 @@ export default function Navigation({ menuOpen, activeSection, onMenuToggle, onNa
 
       {/* Members Login Dropdown */}
       {showMembersLogin && (
-        <div className="fixed top-16 sm:top-20 right-4 sm:right-6 z-50" data-members-dropdown>
+        <div className="fixed top-20 sm:top-24 right-4 sm:right-6 z-50" data-members-dropdown>
           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-3 w-80 max-w-[calc(100vw-2rem)]">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
