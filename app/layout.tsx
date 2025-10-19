@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cromwell Fish & Game Club",
   description: "Join our community of outdoor enthusiasts! Hunting, fishing, and community events for all ages.",
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
