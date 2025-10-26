@@ -125,7 +125,7 @@ export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>
       }, { status: 400 });
     }
 
-    // Verify CAPTCHA with Google
+    // Verify CAPTCHA with Google (v3)
     const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
     if (recaptchaSecret) {
       try {
@@ -142,14 +142,26 @@ export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>
         if (!recaptchaResult.success) {
           return NextResponse.json({ 
             ok: false, 
-            error: 'CAPTCHA verification failed. Please try again.' 
+            error: 'Security verification failed. Please try again.' 
+          }, { status: 400 });
+        }
+
+        // For v3, also check the score (0.0 to 1.0, where 1.0 is very likely a good interaction)
+        const score = recaptchaResult.score || 0;
+        const minScore = 0.5; // Adjust this threshold as needed
+        
+        if (score < minScore) {
+          console.log(`reCAPTCHA score too low: ${score} (minimum: ${minScore})`);
+          return NextResponse.json({ 
+            ok: false, 
+            error: 'Security verification failed. Please try again.' 
           }, { status: 400 });
         }
       } catch (err) {
         console.error('CAPTCHA verification error:', err);
         return NextResponse.json({ 
           ok: false, 
-          error: 'CAPTCHA verification failed. Please try again.' 
+          error: 'Security verification failed. Please try again.' 
         }, { status: 400 });
       }
     }
