@@ -108,41 +108,7 @@ export default function WaitlistForm() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
-  // This function will be called by reCAPTCHA after verification
-  const submitFormWithToken = async (token: string) => {
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          captchaToken: token
-        }),
-      });
-      
-      const json = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(json?.error || 'Submission failed');
-      }
-      
-      if (json.fallback) {
-        setStatus('Thanks — added to wait list (stored temporarily).');
-      } else if (json.persistedTo) {
-        setStatus('Thanks — you have been added to the wait list.');
-      } else {
-        setStatus('Thanks — you have been added to the wait list.');
-      }
-      
-      clearForm();
-    } catch (err: any) {
-      setStatus(`Error: ${err?.message || 'Could not submit'}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load reCAPTCHA and expose submit function
+  // Load reCAPTCHA
   useEffect(() => {
     const loadRecaptcha = () => {
       if (typeof window !== 'undefined' && window.grecaptcha) {
@@ -152,11 +118,6 @@ export default function WaitlistForm() {
       }
     };
     loadRecaptcha();
-
-    // Expose submit function to global scope for reCAPTCHA callback
-    if (typeof window !== 'undefined') {
-      (window as any).submitFormWithToken = submitFormWithToken;
-    }
   }, []);
 
   const handleInputChange = (field: keyof WaitlistFormData) => 
@@ -226,9 +187,53 @@ export default function WaitlistForm() {
       return;
     }
 
-    // For reCAPTCHA v2, the token is automatically added to the form
-    // We'll let the onSubmit callback handle the actual submission
-    return;
+    // For reCAPTCHA v2, we need to programmatically trigger the challenge
+    if (typeof window !== 'undefined' && window.grecaptcha) {
+      try {
+        const token = await window.grecaptcha.execute('6LfXyvcrAAAAAHsoEJxMoYCLQeAn4wKIoSPvigfh', { action: 'submit' });
+        await submitFormWithToken(token);
+      } catch (err) {
+        console.error('reCAPTCHA error:', err);
+        setStatus('Security verification failed. Please try again.');
+        setLoading(false);
+      }
+    } else {
+      setStatus('Security verification not available. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const submitFormWithToken = async (token: string) => {
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          captchaToken: token
+        }),
+      });
+      
+      const json = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(json?.error || 'Submission failed');
+      }
+      
+      if (json.fallback) {
+        setStatus('Thanks — added to wait list (stored temporarily).');
+      } else if (json.persistedTo) {
+        setStatus('Thanks — you have been added to the wait list.');
+      } else {
+        setStatus('Thanks — you have been added to the wait list.');
+      }
+      
+      clearForm();
+    } catch (err: any) {
+      setStatus(`Error: ${err?.message || 'Could not submit'}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const TextAreaField = ({ 
@@ -381,10 +386,7 @@ export default function WaitlistForm() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
                 type="submit" 
-                className="g-recaptcha w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                data-sitekey="6LfXyvcrAAAAAHsoEJxMoYCLQeAn4wKIoSPvigfh"
-                data-callback="onSubmit"
-                data-action="submit"
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 disabled={loading}
               >
                 {loading ? (
