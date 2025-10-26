@@ -31,10 +31,26 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script
-          src="https://www.google.com/recaptcha/api.js?render=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+          src="https://www.google.com/recaptcha/api.js"
           async
           defer
         ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function onSubmit(token) {
+                // Find the React component and call its submit function
+                const form = document.getElementById("demo-form");
+                if (form && window.submitFormWithToken) {
+                  window.submitFormWithToken(token);
+                } else {
+                  // Fallback: submit the form normally
+                  form.submit();
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -108,7 +108,41 @@ export default function WaitlistForm() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
-  // Load reCAPTCHA v3
+  // This function will be called by reCAPTCHA after verification
+  const submitFormWithToken = async (token: string) => {
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          captchaToken: token
+        }),
+      });
+      
+      const json = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(json?.error || 'Submission failed');
+      }
+      
+      if (json.fallback) {
+        setStatus('Thanks — added to wait list (stored temporarily).');
+      } else if (json.persistedTo) {
+        setStatus('Thanks — you have been added to the wait list.');
+      } else {
+        setStatus('Thanks — you have been added to the wait list.');
+      }
+      
+      clearForm();
+    } catch (err: any) {
+      setStatus(`Error: ${err?.message || 'Could not submit'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load reCAPTCHA and expose submit function
   useEffect(() => {
     const loadRecaptcha = () => {
       if (typeof window !== 'undefined' && window.grecaptcha) {
@@ -118,6 +152,11 @@ export default function WaitlistForm() {
       }
     };
     loadRecaptcha();
+
+    // Expose submit function to global scope for reCAPTCHA callback
+    if (typeof window !== 'undefined') {
+      (window as any).submitFormWithToken = submitFormWithToken;
+    }
   }, []);
 
   const handleInputChange = (field: keyof WaitlistFormData) => 
@@ -170,10 +209,7 @@ export default function WaitlistForm() {
       return 'Please enter a valid state.';
     }
 
-    // Validate CAPTCHA
-    if (!captchaToken) {
-      return 'Please complete the CAPTCHA verification.';
-    }
+    // CAPTCHA validation is handled by reCAPTCHA v2 automatically
 
     return null;
   };
@@ -190,54 +226,10 @@ export default function WaitlistForm() {
       return;
     }
 
-    // Get reCAPTCHA v3 token
-    let token = null;
-    if (recaptchaLoaded && typeof window !== 'undefined' && window.grecaptcha) {
-      try {
-        token = await window.grecaptcha.execute(
-          process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-          { action: 'waitlist_submit' }
-        );
-      } catch (err) {
-        console.error('reCAPTCHA error:', err);
-        setStatus('Security verification failed. Please try again.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          captchaToken: token
-        }),
-      });
-      
-      const json = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(json?.error || 'Submission failed');
-      }
-      
-      if (json.fallback) {
-        setStatus('Thanks — added to wait list (stored temporarily).');
-      } else if (json.persistedTo) {
-        setStatus('Thanks — you have been added to the wait list.');
-      } else {
-        setStatus('Thanks — you have been added to the wait list.');
-      }
-      
-      clearForm();
-    } catch (err: any) {
-      setStatus(`Error: ${err?.message || 'Could not submit'}`);
-    } finally {
-      setLoading(false);
-    }
+    // For reCAPTCHA v2, the token is automatically added to the form
+    // We'll let the onSubmit callback handle the actual submission
+    return;
   };
-
 
   const TextAreaField = ({ 
     field, 
@@ -286,7 +278,7 @@ export default function WaitlistForm() {
     <div className="w-full mx-auto px-4 sm:px-8 lg:px-16 xl:px-24">
       {/* Form */}
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 lg:p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="demo-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
@@ -389,13 +381,10 @@ export default function WaitlistForm() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
                 type="submit" 
-                className="
-                  w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 
-                  text-white font-semibold rounded-lg shadow-lg hover:shadow-xl
-                  transform hover:scale-105 transition-all duration-200
-                  flex items-center justify-center gap-3
-                  disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-                "
+                className="g-recaptcha w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                data-sitekey="6LfXyvcrAAAAAHsoEJxMoYCLQeAn4wKIoSPvigfh"
+                data-callback="onSubmit"
+                data-action="submit"
                 disabled={loading}
               >
                 {loading ? (
