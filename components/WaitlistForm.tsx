@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import type { WaitlistFormData } from "../types";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -96,6 +97,8 @@ export default function WaitlistForm() {
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleInputChange = (field: keyof WaitlistFormData) => 
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -121,6 +124,10 @@ export default function WaitlistForm() {
     });
     setStatus('');
     setFieldErrors({});
+    setCaptchaToken(null);
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
   };
 
   const validateForm = (): string | null => {
@@ -146,6 +153,11 @@ export default function WaitlistForm() {
       return 'Please enter a valid state.';
     }
 
+    // Validate CAPTCHA
+    if (!captchaToken) {
+      return 'Please complete the CAPTCHA verification.';
+    }
+
     return null;
   };
 
@@ -165,7 +177,10 @@ export default function WaitlistForm() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          captchaToken
+        }),
       });
       
       const json = await res.json();
@@ -336,6 +351,34 @@ export default function WaitlistForm() {
             </div>
           </div>
 
+          {/* CAPTCHA Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-6 bg-green-500 rounded-full"></div>
+              <h4 className="text-lg font-semibold text-gray-900">Security Verification</h4>
+            </div>
+            
+            <div className="flex justify-center">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
+                onChange={(token) => setCaptchaToken(token)}
+                onExpired={() => setCaptchaToken(null)}
+                onError={() => setCaptchaToken(null)}
+                theme="light"
+                size="normal"
+              />
+            </div>
+            
+            {fieldErrors.captcha && (
+              <p className="text-xs text-red-600 flex items-center justify-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {fieldErrors.captcha}
+              </p>
+            )}
+          </div>
 
           {/* Submit Section */}
           <div className="pt-6 border-t border-gray-200">

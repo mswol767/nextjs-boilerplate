@@ -28,6 +28,7 @@ export interface WaitlistFormData {
   address: string;
   town: string;
   state: string;
+  captchaToken?: string;
 }
 
 // Waitlist types

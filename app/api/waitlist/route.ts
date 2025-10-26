@@ -108,13 +108,50 @@ export async function GET(req: Request) {
 export async function POST(req: Request): Promise<NextResponse<WaitlistResponse>> {
   try {
     const body = await req.json();
-    const { name, email, phone, address, town, state }: WaitlistFormData = body;
+    const { name, email, phone, address, town, state, captchaToken }: WaitlistFormData = body;
 
     if (!name || !email) {
       return NextResponse.json({ 
         ok: false, 
         error: 'Name and email are required' 
       }, { status: 400 });
+    }
+
+    // Verify CAPTCHA token
+    if (!captchaToken) {
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'CAPTCHA verification is required' 
+      }, { status: 400 });
+    }
+
+    // Verify CAPTCHA with Google
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    if (recaptchaSecret) {
+      try {
+        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `secret=${recaptchaSecret}&response=${captchaToken}`,
+        });
+
+        const recaptchaResult = await recaptchaResponse.json();
+        
+        if (!recaptchaResult.success) {
+          return NextResponse.json({ 
+            ok: false, 
+            error: 'CAPTCHA verification failed. Please try again.' 
+          }, { status: 400 });
+        }
+      } catch (err) {
+        console.error('CAPTCHA verification error:', err);
+        return NextResponse.json({ 
+          ok: false, 
+          error: 'CAPTCHA verification failed. Please try again.' 
+        }, { status: 400 });
+      }
     }
 
     const entry: WaitEntry = {
