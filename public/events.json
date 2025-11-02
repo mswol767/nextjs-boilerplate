@@ -1,20 +1,5 @@
 [
   {
-    "id": "monthly-2025-10",
-    "title": "Monthly Meeting",
-    "description": "Monthly club meeting",
-    "start": "2025-10-02T18:30:00",
-    "durationMinutes": 60
-  },
-  {
-    "id": "annual-2025",
-    "title": "Annual Member Meeting",
-    "description": "Annual meeting for members",
-    "start": "2025-10-02T19:00:00",
-    "durationMinutes": 90,
-    "isAnnual": true
-  },
-  {
     "id": "monthly-2025-11",
     "title": "Monthly Meeting",
     "description": "Monthly club meeting",
