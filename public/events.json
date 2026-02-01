@@ -1,12 +1,5 @@
 [
   {
-    "id": "monthly-2026-01",
-    "title": "Monthly Meeting",
-    "description": "Monthly club meeting",
-    "start": "2026-01-01T18:30:00",
-    "durationMinutes": 60
-  },
-  {
     "id": "monthly-2026-02",
     "title": "Monthly Meeting",
     "description": "Monthly club meeting",
